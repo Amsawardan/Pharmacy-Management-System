@@ -1,0 +1,46 @@
+/* DashboardCards.css */
+
+/* Card grid layout */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Card styling */
+.card {
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Card hover effect */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Card button */
+.card button {
+  margin-top: 10px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.card button:hover {
+  background-color: rgba(255,255,255,0.4);
+}
+
+/* Card colors */
+.green { background-color: #16a34a; }
+.yellow { background-color: #ca8a04; }
+.blue { background-color: #2563eb; }
+.red { background-color: #dc2626; }
