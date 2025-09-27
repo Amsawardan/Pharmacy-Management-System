@@ -1,6 +1,8 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.service;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.Order;
+import com.Pharmacy_Management_System.Raj_Pharmacy.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,43 +12,32 @@ import java.util.List;
 @Service
 public class OrderService {
 
-    List<Order> orders = new ArrayList<>(Arrays.asList(
+    @Autowired
+    OrderRepository orderRepository;
+
+    /*List<Order> orders = new ArrayList<>(Arrays.asList(
             new Order(101,"Penadol",100),
             new Order(102,"Asprine",1600),
             new Order(103,"Digene",1200)));
+     */
 
     public List<Order> getOrders(){
-        return orders;
+        return orderRepository.findAll();
     }
 
     public Order getOrderById(int OrderId) {
-        for(int i = 0; i < orders.size(); i++){
-            if(orders.get(i).getOrderId() == OrderId){
-                return orders.get(i);
-            }
-        }
-        return null;
+        return orderRepository.findById(OrderId).orElse(new Order());
     }
 
     public void addOrder(Order order){
-        orders.add(order);
+        orderRepository.save(order);
     }
 
     public void updateOrder(Order order){
-        int index = 0;
-        for(int i = 0; i < orders.size(); i++){
-            if(orders.get(i).getOrderId() == order.getOrderId())
-                index = i;
-        }
-        orders.set(index, order);
+        orderRepository.save(order);
     }
 
     public void deleteOrder(int orderId) {
-        int index = 0;
-        for(int i = 0; i < orders.size(); i++){
-            if(orders.get(i).getOrderId() == orderId)
-                index = i;
-        }
-        orders.remove(index);
+        orderRepository.deleteById(orderId);
     }
 }
