@@ -40,4 +40,13 @@ public class OrderService {
         }
         orders.set(index, order);
     }
+
+    public void deleteOrder(int orderId) {
+        int index = 0;
+        for(int i = 0; i < orders.size(); i++){
+            if(orders.get(i).getOrderId() == orderId)
+                index = i;
+        }
+        orders.remove(index);
+    }
 }
