@@ -27,4 +27,9 @@ public class OrderController {
     public void addOrder(@RequestBody Order order){
         orderservice.addOrder( order);
     }
+
+    @PutMapping("/orders")
+    public void updateOrder(@RequestBody Order order){
+        orderservice.updateOrder(order);
+    }
 }

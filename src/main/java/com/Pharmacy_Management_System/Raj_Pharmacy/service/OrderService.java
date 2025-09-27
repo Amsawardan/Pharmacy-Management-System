@@ -31,4 +31,13 @@ public class OrderService {
     public void addOrder(Order order){
         orders.add(order);
     }
+
+    public void updateOrder(Order order){
+        int index = 0;
+        for(int i = 0; i < orders.size(); i++){
+            if(orders.get(i).getOrderId() == order.getOrderId())
+                index = i;
+        }
+        orders.set(index, order);
+    }
 }
