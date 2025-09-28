@@ -9,12 +9,14 @@ public class User {
     private  String name;
     private String email;
     private  String password;
+    private  String address;
 
-    public User(int id, String name, String email, String password) {
+    public User(int id, String name, String email, String password, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.address = address;
     }
 
     public User() {
@@ -50,5 +52,24 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", address='" + address + '\'' +
+                '}';
     }
 }
