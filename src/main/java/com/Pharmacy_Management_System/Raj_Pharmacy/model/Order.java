@@ -14,14 +14,16 @@ public class Order {
     private int orderId;
     private String orderName;
     private int orderVal;
+    private int orderQuantity;
 
     public Order() {
     }
 
-    public Order(int orderId, String orderName, int orderVal) {
+    public Order(int orderId, String orderName, int orderVal, int orderQuantity) {
         this.orderId = orderId;
         this.orderName = orderName;
         this.orderVal = orderVal;
+        this.orderQuantity = orderQuantity;
     }
 
     public int getOrderId() {
@@ -46,5 +48,13 @@ public class Order {
 
     public void setOrderVal(int orderVal) {
         this.orderVal = orderVal;
+    }
+
+    public int getOrderQuantity() {
+        return orderQuantity;
+    }
+
+    public void setOrderQuantity(int orderQuantity) {
+        this.orderQuantity = orderQuantity;
     }
 }
