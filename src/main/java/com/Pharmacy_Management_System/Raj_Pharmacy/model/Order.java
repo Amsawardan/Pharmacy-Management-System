@@ -1,8 +1,6 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
     private String orderName;
     private int orderVal;
