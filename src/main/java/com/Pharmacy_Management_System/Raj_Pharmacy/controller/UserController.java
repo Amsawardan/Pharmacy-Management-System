@@ -28,4 +28,9 @@ public class UserController {
         System.out.println(user);
         service.addUser(user);
     }
+
+    @PutMapping("/User")
+    public void updateUser(@RequestBody User user){
+        service.updateUser(user);
+    }
 }

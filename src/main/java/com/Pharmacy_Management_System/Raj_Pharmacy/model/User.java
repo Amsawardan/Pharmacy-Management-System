@@ -1,10 +1,14 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
-import jdk.jfr.DataAmount;
+import jakarta.persistence.*;
+import org.springframework.stereotype.Component;
 
-
+@Component
+@Entity
+@Table (name = "users")
 public class User {
 
+    @Id
     private  int id;
     private  String name;
     private String email;

@@ -1,35 +1,31 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.service;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.User;
+import com.Pharmacy_Management_System.Raj_Pharmacy.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class UserService {
-    List<User> users;
 
-    public UserService() {
-        users = new ArrayList<>(Arrays.asList(
-                new User(001, "Nadhir", "nadhir1@gmail.com", "1234","Malabe east,Malbe"),
-                new User(002, "Amsan", "amsan2@gmail.com", "5678", "Malabe north,Malabe")));
-
-    }
+    @Autowired
+    UserRepository userRepository;
 
     public List<User> getUser() {
-        return users;
+        return userRepository.findAll() ;
     }
 
     public User getUserById(int id) {
-        return users.stream()
-                .filter(i -> i.getId() == id)
-                .findFirst().get();
+        return userRepository.findById(id).orElse(new User());
     }
 
     public void addUser(User user){
-        users.add(user);
+        userRepository.save(user);
+    }
+
+    public void updateUser(User user) {
+        userRepository.save(user);
     }
 }
