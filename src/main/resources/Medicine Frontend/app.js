@@ -1,13 +1,13 @@
 const API_URL = "http://localhost:8081/api/medicines";
 
-// Init
+                                                           // Init
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMedicines();
     await loadLowStockMedicines();
     await loadExpiredMedicines();
 });
 
-// Add Medicine
+                                                        // Add Medicine
 document.getElementById("medicineForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const medicine = {
@@ -34,7 +34,7 @@ document.getElementById("medicineForm").addEventListener("submit", async (e) => 
     await reloadAll();
 });
 
-// Load All Medicines
+                                                     // Load All Medicines
 async function loadMedicines() {
     const res = await fetch(`${API_URL}/list`);
     const medicines = await res.json();
@@ -55,7 +55,7 @@ async function loadMedicines() {
     });
 }
 
-// Load Low Stock
+                                                       // Load Low Stock
 async function loadLowStockMedicines() {
     const res = await fetch(`${API_URL}/low-stock`);
     const lowStock = await res.json();
@@ -64,7 +64,7 @@ async function loadLowStockMedicines() {
     lowStock.forEach((med) => list.appendChild(Object.assign(document.createElement("li"), { textContent: `${med.name} - Stock: ${med.stock}` })));
 }
 
-// Load Expired
+                                                        // Load Expired
 async function loadExpiredMedicines() {
     const res = await fetch(`${API_URL}/expired`);
     const expired = await res.json();
@@ -73,7 +73,7 @@ async function loadExpiredMedicines() {
     expired.forEach((med) => list.appendChild(Object.assign(document.createElement("li"), { textContent: `${med.name} - Expired: ${med.expiryDate}` })));
 }
 
-// Delete
+                                                           // Delete
 async function deleteMedicine(id) {
     if (confirm("Are you sure?")) {
         await fetch(`${API_URL}/delete/${id}`, { method: "DELETE" });
@@ -81,7 +81,7 @@ async function deleteMedicine(id) {
     }
 }
 
-// Update (prompt-based)
+                                            // Update (prompt-based)
 async function updateMedicine(id) {
     const newStock = prompt("Enter new stock:");
     const newPrice = prompt("Enter new price:");
@@ -101,7 +101,7 @@ async function updateMedicine(id) {
     await reloadAll();
 }
 
-// Get Medicine by ID
+                                            // Get Medicine by ID
 async function getMedicineById() {
     const id = document.getElementById("medicineIdInput").value;
     if (!id) return alert("Enter ID");
@@ -110,7 +110,7 @@ async function getMedicineById() {
     document.getElementById("medicineByIdResult").textContent = res.status === 404 ? "Medicine not found" : `${med.name} (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
 }
 
-// Reload all lists
+                                    // Reload all lists
 async function reloadAll() {
     await loadMedicines();
     await loadLowStockMedicines();
