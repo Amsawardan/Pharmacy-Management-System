@@ -1,9 +1,8 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jdk.jfr.DataAmount;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class User {
 
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private  int id;
     private  String name;
     private String email;
