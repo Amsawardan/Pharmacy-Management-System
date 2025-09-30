@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:8081/api/medicines";
 
-                                                           // Init
+// Init
 document.addEventListener("DOMContentLoaded", async () => {
     await loadMedicines();
     await loadLowStockMedicines();
