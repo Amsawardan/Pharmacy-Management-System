@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicine Management</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="container">
+    <h1>Raj Pharmacy - Medicine Management</h1>
+
+    <!-- Add Medicine -->
+    <h2>Add Medicine</h2>
+    <form id="medicineForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required />
+
+        <label for="category">Category:</label>
+        <input type="text" id="category" required />
+
+        <label for="batchNo">Batch No:</label>
+        <input type="text" id="batchNo" required />
+
+        <label for="stock">Stock:</label>
+        <input type="number" id="stock" required />
+
+        <label for="price">Price:</label>
+        <input type="number" step="0.01" id="price" required />
+
+        <label for="expiryDate">Expiry Date:</label>
+        <input type="date" id="expiryDate" required />
+
+        <label for="supplierId">Supplier ID:</label>
+        <input type="number" id="supplierId" required />
+
+        <label for="description">Description:</label>
+        <textarea id="description"></textarea>
+
+        <label for="dosageInstructions">Dosage Instructions:</label>
+        <textarea id="dosageInstructions"></textarea>
+
+        <label for="sideEffects">Side Effects:</label>
+        <textarea id="sideEffects"></textarea>
+
+        <button type="submit">Add Medicine</button>
+    </form>
+
+    <!-- Alerts -->
+    <h2>Alerts</h2>
+    <div id="lowStockAlert">
+        <h3>Low Stock Medicines</h3>
+        <ul id="lowStockList"></ul>
+    </div>
+    <div id="expiredAlert">
+        <h3>Expired Medicines</h3>
+        <ul id="expiredList"></ul>
+    </div>
+
+    <!-- Medicine List -->
+    <h2>All Medicines</h2>
+    <ul id="medicineList"></ul>
+
+    <!-- Get Medicine By ID -->
+    <h2>Find Medicine by ID</h2>
+    <label for="medicineIdInput">Medicine ID:</label>
+    <input type="number" id="medicineIdInput" placeholder="Enter ID" />
+    <button onclick="getMedicineById()">Search</button>
+    <div id="medicineByIdResult"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
