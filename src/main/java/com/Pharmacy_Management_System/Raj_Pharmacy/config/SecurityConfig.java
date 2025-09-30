@@ -1,4 +1,4 @@
-package com.Pharmacy_Management_System.Raj_Pharmacy.config;
+/*package com.Pharmacy_Management_System.Raj_Pharmacy.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,4 +18,4 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-}
+}*/
