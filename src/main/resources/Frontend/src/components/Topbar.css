@@ -1,0 +1,39 @@
+/* Topbar.css */
+
+/* Topbar container */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 16px;          /* p-4 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* shadow */
+  margin-bottom: 16px;    /* mb-4 */
+}
+
+/* Search input */
+.topbar input {
+  border: 1px solid #ccc;
+  padding: 8px 12px;      /* px-3 py-2 */
+  border-radius: 6px;     /* rounded */
+  width: 256px;            /* w-64 */
+  font-size: 1rem;
+}
+
+/* Right section (user info) */
+.topbar .right {
+  display: flex;
+  align-items: center;
+  gap: 24px;              /* gap-6 */
+  font-size: 0.875rem;    /* text-sm */
+}
+
+/* Bold text */
+.topbar .right .font-semibold {
+  font-weight: 600;
+}
+
+/* Gray text */
+.topbar .right .text-gray-600 {
+  color: #4b5563;
+}
