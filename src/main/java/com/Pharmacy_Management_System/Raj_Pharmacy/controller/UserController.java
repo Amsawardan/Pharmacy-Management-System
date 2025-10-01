@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins="*")
 public class UserController {
 
     @Autowired
@@ -33,5 +34,4 @@ public class UserController {
     public void updateUser(@RequestBody User user){
         service.updateUser(user);
     }
-
 }
