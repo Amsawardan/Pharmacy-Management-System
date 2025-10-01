@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadExpiredMedicines();
 });
 
-                                                        // Add Medicine
+// Add Medicine
 document.getElementById("medicineForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const medicine = {
@@ -34,7 +34,7 @@ document.getElementById("medicineForm").addEventListener("submit", async (e) => 
     await reloadAll();
 });
 
-                                                     // Load All Medicines
+// Load All Medicines
 async function loadMedicines() {
     const res = await fetch(`${API_URL}/list`);
     const medicines = await res.json();
@@ -47,7 +47,7 @@ async function loadMedicines() {
         <strong>${med.name}</strong> (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}
       </div>
       <div class="actions">
-        <button class="update-btn" onclick="updateMedicine(${med.id})">Update</button>
+        <button class="update-btn" onclick="openUpdateModal(${med.id})">Update</button>
         <button class="delete-btn" onclick="deleteMedicine(${med.id})">Delete</button>
       </div>
     `;
@@ -55,25 +55,33 @@ async function loadMedicines() {
     });
 }
 
-                                                       // Load Low Stock
+// Load Low Stock
 async function loadLowStockMedicines() {
     const res = await fetch(`${API_URL}/low-stock`);
     const lowStock = await res.json();
     const list = document.getElementById("lowStockList");
     list.innerHTML = "";
-    lowStock.forEach((med) => list.appendChild(Object.assign(document.createElement("li"), { textContent: `${med.name} - Stock: ${med.stock}` })));
+    lowStock.forEach((med) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span style="color:red; font-weight:bold;">⚠️ ${med.name}</span> - Stock: ${med.stock}`;
+        list.appendChild(li);
+    });
 }
 
-                                                        // Load Expired
+// Load Expired
 async function loadExpiredMedicines() {
     const res = await fetch(`${API_URL}/expired`);
     const expired = await res.json();
     const list = document.getElementById("expiredList");
     list.innerHTML = "";
-    expired.forEach((med) => list.appendChild(Object.assign(document.createElement("li"), { textContent: `${med.name} - Expired: ${med.expiryDate}` })));
+    expired.forEach((med) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span style="color:darkred; font-weight:bold;">⏰ ${med.name}</span> - Expired: ${med.expiryDate}`;
+        list.appendChild(li);
+    });
 }
 
-                                                           // Delete
+// Delete
 async function deleteMedicine(id) {
     if (confirm("Are you sure?")) {
         await fetch(`${API_URL}/delete/${id}`, { method: "DELETE" });
@@ -81,40 +89,75 @@ async function deleteMedicine(id) {
     }
 }
 
-                                            // Update (prompt-based)
-async function updateMedicine(id) {
-    const newStock = prompt("Enter new stock:");
-    const newPrice = prompt("Enter new price:");
-    if (!newStock || !newPrice) return;
-
+// ✅ Open Update Modal
+async function openUpdateModal(id) {
     const res = await fetch(`${API_URL}/${id}`);
-    const medicine = await res.json();
-    medicine.stock = parseInt(newStock);
-    medicine.price = parseFloat(newPrice);
+    const med = await res.json();
+
+    // fill modal form
+    document.getElementById("updateId").value = med.id;
+    document.getElementById("updateName").value = med.name;
+    document.getElementById("updateCategory").value = med.category;
+    document.getElementById("updateBatchNo").value = med.batchNo;
+    document.getElementById("updateStock").value = med.stock;
+    document.getElementById("updatePrice").value = med.price;
+    document.getElementById("updateExpiryDate").value = med.expiryDate;
+    document.getElementById("updateSupplierId").value = med.supplierId;
+    document.getElementById("updateDescription").value = med.description || "";
+    document.getElementById("updateDosageInstructions").value = med.dosageInstructions || "";
+    document.getElementById("updateSideEffects").value = med.sideEffects || "";
+
+    document.getElementById("updateModal").style.display = "block";
+}
+
+// ✅ Submit Update Form
+document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("updateId").value;
+    const medicine = {
+        name: document.getElementById("updateName").value,
+        category: document.getElementById("updateCategory").value,
+        batchNo: document.getElementById("updateBatchNo").value,
+        stock: parseInt(document.getElementById("updateStock").value),
+        price: parseFloat(document.getElementById("updatePrice").value),
+        expiryDate: document.getElementById("updateExpiryDate").value,
+        supplierId: parseInt(document.getElementById("updateSupplierId").value),
+        description: document.getElementById("updateDescription").value,
+        dosageInstructions: document.getElementById("updateDosageInstructions").value,
+        sideEffects: document.getElementById("updateSideEffects").value,
+    };
 
     await fetch(`${API_URL}/update/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(medicine)
     });
-    alert("Medicine updated!");
-    await reloadAll();
-}
 
-                                            // Get Medicine by ID
+    alert("Medicine updated!");
+    document.getElementById("updateModal").style.display = "none";
+    await reloadAll();
+});
+
+// Close modal
+document.querySelector(".close").addEventListener("click", () => {
+    document.getElementById("updateModal").style.display = "none";
+});
+
+// Get Medicine by ID
 async function getMedicineById() {
     const id = document.getElementById("medicineIdInput").value;
     if (!id) return alert("Enter ID");
     const res = await fetch(`${API_URL}/${id}`);
     const med = await res.json();
-    document.getElementById("medicineByIdResult").textContent = res.status === 404 ? "Medicine not found" : `${med.name} (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
+    document.getElementById("medicineByIdResult").textContent = res.status === 404 ?
+        "Medicine not found" :
+        `${med.name} (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
 }
 
-                                    // Reload all lists
+// Reload all lists
 async function reloadAll() {
     await loadMedicines();
     await loadLowStockMedicines();
     await loadExpiredMedicines();
 }
-
-
