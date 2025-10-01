@@ -1,55 +1,48 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.service;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.Admin;
-import com.Pharmacy_Management_System.Raj_Pharmacy.model.Role;
+import com.Pharmacy_Management_System.Raj_Pharmacy.repository.AdminRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class AdminService {
 
-    private List<Admin> admins = new ArrayList<>();
-
-    // Constructor with some sample data (optional)
-    public AdminService() {
-        admins.add(new Admin(1, "John Doe", "admin1", "password123", Role.ADMIN));
-        admins.add(new Admin(2, "Jane Smith", "manager1", "managerPass", Role.MANAGER));
-    }
+    private AdminRepository adminRepository;
 
     // Get all admins
     public List<Admin> getAllAdmins() {
-        return admins;
+        return adminRepository.findAll();
     }
 
     // Get admin by ID
     public Admin getAdminById(int staffID) {
-        return admins.stream()
-                .filter(admin -> admin.getStaffID() == staffID)
-                .findFirst()
-                .orElse(null);
+        return adminRepository.findById(staffID).orElse(null);
     }
 
     // Add a new admin
-    public void addAdmin(Admin admin) {
-        admins.add(admin);
+    public Admin addAdmin(Admin admin) {
+        return adminRepository.save(admin);
     }
 
     // Update admin
-    public void updateAdmin(int staffID, Admin updatedAdmin) {
-        for (int i = 0; i < admins.size(); i++) {
-            Admin existing = admins.get(i);
-            if (existing.getStaffID() == staffID) {
-                admins.set(i, updatedAdmin);
-                return;
-            }
+    public Admin updateAdmin(int staffID, Admin updatedAdmin) {
+        if (adminRepository.existsById(staffID)) {
+            updatedAdmin.setStaffID(staffID);
+            return adminRepository.save(updatedAdmin);
         }
+        return null; // or throw exception
     }
 
     // Delete admin
     public void deleteAdmin(int staffID) {
-        admins.removeIf(admin -> admin.getStaffID() == staffID);
+        adminRepository.deleteById(staffID);
     }
 }
+
 

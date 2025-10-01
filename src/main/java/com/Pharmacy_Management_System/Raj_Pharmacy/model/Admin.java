@@ -1,15 +1,31 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
+import jakarta.persistence.*;  // for JPA annotations
+import org.springframework.stereotype.Component;
+
+@Component
+@Entity
+@Table(name = "admins")
 public class Admin {
 
-    private int staffID;
-    private String fullName;
-    private String username;
-    private String password;
-    private Role role;  // use enum instead of String
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    private Integer staffID;
 
-    public Admin() {
-    }
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)  // Store enum as String (e.g., "ADMIN")
+    @Column(nullable = false)
+    private Role role;
+
+    public Admin() {}
 
     public Admin(int staffID, String fullName, String username, String password, Role role) {
         this.staffID = staffID;
