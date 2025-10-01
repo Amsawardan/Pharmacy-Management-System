@@ -67,13 +67,15 @@ function showReadForm() {
             const users = Array.isArray(data) ? data : [data];
             users.forEach(user => {
                 output.innerHTML += `
-                    <div>
-                        <strong>ID:</strong> ${user.id} |
-                        <strong>Name:</strong> ${user.name} |
-                        <strong>Email:</strong> ${user.email} |
-                        <strong>Address:</strong> ${user.address}
+                    <div class="user-card">
+                        <div>
+                            <strong>ID:</strong> ${user.id} |
+                            <strong>Name:</strong> ${user.name} |
+                            <strong>Email:</strong> ${user.email} |
+                            <strong>Address:</strong> ${user.address}
+                        </div>
+                        <button class="delete" onclick="deleteUser(${user.id})">Delete</button>
                     </div>
-                    <hr>
                 `;
             });
         })
@@ -118,4 +120,35 @@ function showUpdateForm() {
         })
         .catch(err => output.innerText = "❌ " + err);
     };
+}
+
+// ================== DELETE ==================
+function showDeleteForm() {
+    formArea.innerHTML = `
+        <h3>Delete User</h3>
+        <form id="deleteForm">
+            <input type="number" id="deleteId" placeholder="User ID" required>
+            <button type="submit" class="delete">Delete User</button>
+        </form>
+    `;
+
+    document.getElementById("deleteForm").onsubmit = function(e) {
+        e.preventDefault();
+        const id = document.getElementById("deleteId").value;
+
+        deleteUser(id);
+    };
+}
+
+// helper function (used in form + read list)
+function deleteUser(id) {
+    fetch(`${API_BASE}/${id}`, {
+        method: "DELETE"
+    })
+    .then(res => res.ok ? "✅ User deleted successfully!" : "❌ Error deleting user")
+    .then(msg => {
+        output.innerText = msg;
+        formArea.innerHTML = "";
+    })
+    .catch(err => output.innerText = "❌ " + err);
 }

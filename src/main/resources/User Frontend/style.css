@@ -50,7 +50,8 @@ form {
 
 input[type="text"],
 input[type="password"],
-input[type="email"] {
+input[type="email"],
+input[type="number"] {
     padding: 8px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -63,4 +64,20 @@ form button {
 
 form button:hover {
     background-color: #1E88E5;
+}
+
+form button.delete {
+    background-color: #f44336;
+}
+
+form button.delete:hover {
+    background-color: #d32f2f;
+}
+
+.user-card {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
