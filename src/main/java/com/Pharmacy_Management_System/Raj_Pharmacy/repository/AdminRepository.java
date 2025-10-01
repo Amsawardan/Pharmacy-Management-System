@@ -1,7 +1,7 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.repository;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.Admin;
-import com.Pharmacy_Management_System.Raj_Pharmacy.model.Role;
+import com.Pharmacy_Management_System.Raj_Pharmacy.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

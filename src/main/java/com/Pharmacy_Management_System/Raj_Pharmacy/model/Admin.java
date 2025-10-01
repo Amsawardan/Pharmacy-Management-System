@@ -1,5 +1,6 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
+import com.Pharmacy_Management_System.Raj_Pharmacy.enums.Role;
 import jakarta.persistence.*;  // for JPA annotations
 import org.springframework.stereotype.Component;
 
