@@ -1,65 +1,65 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: #f4f4f4;
-    padding: 40px;
-}
+/*body {*/
+/*    font-family: Arial, sans-serif;*/
+/*    text-align: center;*/
+/*    background: #f4f4f4;*/
+/*    padding: 40px;*/
+/*}*/
 
-h1 {
-    margin-bottom: 20px;
-    color: #333;
-}
+/*h1 {*/
+/*    margin-bottom: 20px;*/
+/*    color: #333;*/
+/*}*/
 
-.buttons {
-    margin-bottom: 30px;
-}
+/*.buttons {*/
+/*    margin-bottom: 30px;*/
+/*}*/
 
-button {
-    margin: 8px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: 0.3s;
-}
+/*button {*/
+/*    margin: 8px;*/
+/*    padding: 12px 20px;*/
+/*    font-size: 16px;*/
+/*    border: none;*/
+/*    background-color: #4CAF50;*/
+/*    color: white;*/
+/*    cursor: pointer;*/
+/*    border-radius: 6px;*/
+/*    transition: 0.3s;*/
+/*}*/
 
-button:hover {
-    background-color: #45a049;
-}
+/*button:hover {*/
+/*    background-color: #45a049;*/
+/*}*/
 
-#output, #form-area {
-    margin-top: 20px;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 650px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+/*#output, #form-area {*/
+/*    margin-top: 20px;*/
+/*    background: white;*/
+/*    padding: 20px;*/
+/*    border-radius: 8px;*/
+/*    max-width: 650px;*/
+/*    margin-left: auto;*/
+/*    margin-right: auto;*/
+/*    text-align: left;*/
+/*    box-shadow: 0 2px 8px rgba(0,0,0,0.1);*/
+/*}*/
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+/*form {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 10px;*/
+/*}*/
 
-input[type="text"],
-input[type="number"] {
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
+/*input[type="text"],*/
+/*input[type="number"] {*/
+/*    padding: 8px;*/
+/*    font-size: 16px;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 4px;*/
+/*}*/
 
-form button {
-    background-color: #2196F3;
-}
+/*form button {*/
+/*    background-color: #2196F3;*/
+/*}*/
 
-form button:hover {
-    background-color: #1E88E5;
-}
+/*form button:hover {*/
+/*    background-color: #1E88E5;*/
+/*}*/
