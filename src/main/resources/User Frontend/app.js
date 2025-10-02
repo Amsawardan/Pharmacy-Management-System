@@ -74,7 +74,6 @@ function showReadForm() {
                             <strong>Email:</strong> ${user.email} |
                             <strong>Address:</strong> ${user.address}
                         </div>
-                        <button class="delete" onclick="deleteUser(${user.id})">Delete</button>
                     </div>
                 `;
             });
@@ -140,7 +139,7 @@ function showDeleteForm() {
     };
 }
 
-// helper function (used in form + read list)
+// helper function (only used in delete form now)
 function deleteUser(id) {
     fetch(`${API_BASE}/${id}`, {
         method: "DELETE"
