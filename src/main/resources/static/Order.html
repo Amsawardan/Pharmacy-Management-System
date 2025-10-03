@@ -9,6 +9,7 @@
             text-align: center;
             background: #f4f4f4;
             padding: 40px;
+            position: relative; /* Needed for absolute positioning of user button */
         }
 
         h1 {
@@ -69,9 +70,31 @@
         form button:hover {
             background-color: #1E88E5;
         }
+
+        /* User button style */
+        #user-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 18px;
+            background-color: #FF9800; /* Orange color */
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        #user-btn:hover {
+            background-color: #e68900;
+        }
     </style>
 </head>
 <body>
+
+<!-- User Button -->
+<a href="http://localhost:8081/User.html" id="user-btn">User</a>
+
 <h1>Pharmacy Orders</h1>
 
 <div class="buttons">
@@ -186,13 +209,13 @@
         document.getElementById("updateForm").onsubmit = function(e) {
             e.preventDefault();
             const updatedOrder = {
-                orderId: parseInt(document.getElementById("updateId").value),
                 orderName: document.getElementById("updateName").value,
                 orderVal: parseInt(document.getElementById("updateVal").value),
                 orderQuantity: parseInt(document.getElementById("updateQuantity").value)
             };
+            const orderId = parseInt(document.getElementById("updateId").value);
 
-            fetch(API_BASE, {
+            fetch(`${API_BASE}/${orderId}`, { // Updated endpoint
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedOrder)
