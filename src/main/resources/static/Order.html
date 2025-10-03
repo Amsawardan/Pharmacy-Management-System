@@ -9,7 +9,7 @@
             text-align: center;
             background: #f4f4f4;
             padding: 40px;
-            position: relative; /* Needed for absolute positioning of top-right buttons */
+            position: relative;
         }
 
         h1 {
@@ -71,7 +71,6 @@
             background-color: #1E88E5;
         }
 
-        /* Top-right buttons */
         .top-buttons {
             position: absolute;
             top: 20px;
@@ -89,23 +88,18 @@
             transition: 0.3s;
         }
 
-        /* Specific colors for each button */
-        #user-btn { background-color: #FF9800; }    /* Orange */
+        #user-btn { background-color: #FF9800; }
         #user-btn:hover { background-color: #e68900; }
-
-        #admin-btn { background-color: #9C27B0; }   /* Purple */
+        #admin-btn { background-color: #9C27B0; }
         #admin-btn:hover { background-color: #7b1fa2; }
-
-        #logout-btn { background-color: #F44336; }  /* Red */
+        #logout-btn { background-color: #F44336; }
         #logout-btn:hover { background-color: #d32f2f; }
-
-        #medicine-btn { background-color: #4CAF50; } /* Green */
+        #medicine-btn { background-color: #4CAF50; }
         #medicine-btn:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
 
-<!-- Top-right buttons -->
 <div class="top-buttons">
     <a href="http://localhost:8081/User.html" id="user-btn">User</a>
     <a href="http://localhost:8081/Admin.html" id="admin-btn">Admin</a>
@@ -122,10 +116,7 @@
     <button onclick="showDeleteForm()">Delete</button>
 </div>
 
-<!-- Dynamic Form Area -->
 <div id="form-area"></div>
-
-<!-- Output / Results -->
 <div id="output"></div>
 
 <script>
@@ -136,138 +127,174 @@
     // ================== CREATE ==================
     function showCreateForm() {
         formArea.innerHTML = `
-                <h3>Create New Order</h3>
-                <form id="createForm">
-                    <input type="text" id="orderName" placeholder="Order Name" required>
-                    <input type="number" id="orderVal" placeholder="Order Value" required>
-                    <input type="number" id="orderQuantity" placeholder="Order Quantity" required>
-                    <button type="submit">Create Order</button>
-                </form>
-            `;
+            <h3>Create New Order</h3>
+            <form id="createForm">
+                <input type="text" id="orderName" placeholder="Order Name" required>
+                <input type="number" id="orderVal" placeholder="Order Value" min="0" required>
+                <input type="number" id="orderQuantity" placeholder="Order Quantity" min="0" required>
+                <button type="submit">Create Order</button>
+            </form>
+        `;
 
-        document.getElementById("createForm").onsubmit = function(e) {
+        document.getElementById("createForm").onsubmit = async function(e) {
             e.preventDefault();
-
             const newOrder = {
-                orderName: document.getElementById("orderName").value,
-                orderVal: parseInt(document.getElementById("orderVal").value),
-                orderQuantity: parseInt(document.getElementById("orderQuantity").value)
+                orderName: document.getElementById("orderName").value.trim(),
+                orderVal: Number(document.getElementById("orderVal").value),
+                orderQuantity: Number(document.getElementById("orderQuantity").value)
             };
 
-            fetch(API_BASE, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newOrder)
-            })
-                .then(res => res.ok ? "✅ Order created successfully!" : "❌ Error creating order")
-                .then(msg => {
-                    output.innerText = msg;
+            if(!newOrder.orderName || isNaN(newOrder.orderVal) || isNaN(newOrder.orderQuantity)){
+                output.innerHTML = `<p style="color:red;">❌ Please fill all fields correctly.</p>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(newOrder)
+                });
+
+                if(res.ok){
+                    output.innerHTML = `<p style="color:green;">✅ Order created successfully!</p>`;
                     formArea.innerHTML = "";
-                })
-                .catch(err => output.innerText = "❌ " + err);
+                } else {
+                    const errorText = await res.text();
+                    output.innerHTML = `<p style="color:red;">❌ Error creating order: ${errorText}</p>`;
+                }
+            } catch(err) {
+                console.error(err);
+                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+            }
         };
     }
 
     // ================== READ ==================
     function showReadForm() {
         formArea.innerHTML = `
-                <h3>Read Orders</h3>
-                <form id="readForm">
-                    <input type="number" id="readId" placeholder="Order ID (leave empty for all)">
-                    <button type="submit">Fetch</button>
-                </form>
-            `;
+            <h3>Read Orders</h3>
+            <form id="readForm">
+                <input type="number" id="readId" placeholder="Order ID (leave empty for all)">
+                <button type="submit">Fetch</button>
+            </form>
+        `;
 
-        document.getElementById("readForm").onsubmit = function(e) {
+        document.getElementById("readForm").onsubmit = async function(e) {
             e.preventDefault();
             const id = document.getElementById("readId").value.trim();
-
             const url = id ? `${API_BASE}/${id}` : API_BASE;
 
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    output.innerHTML = "<h3>📋 Result:</h3>";
+            try {
+                const res = await fetch(url);
+                if(!res.ok){
+                    output.innerHTML = `<p style="color:red;">❌ Order not found.</p>`;
+                    return;
+                }
 
-                    if (!data || (Array.isArray(data) && data.length === 0)) {
-                        output.innerHTML += "<p>No data found.</p>";
-                        return;
-                    }
+                const data = await res.json();
+                output.innerHTML = "<h3>📋 Orders:</h3>";
 
-                    const orders = Array.isArray(data) ? data : [data];
-                    orders.forEach(order => {
-                        output.innerHTML += `
-                            <div>
-                                <strong>ID:</strong> ${order.orderId} |
-                                <strong>Name:</strong> ${order.orderName} |
-                                <strong>Value:</strong> ${order.orderVal} |
-                                <strong>Quantity:</strong> ${order.orderQuantity}
-                            </div>
-                            <hr>
-                        `;
-                    });
-                })
-                .catch(err => output.innerText = "❌ " + err);
+                const orders = Array.isArray(data) ? data : [data];
+                orders.forEach(order => {
+                    output.innerHTML += `
+                        <div>
+                            <strong>ID:</strong> ${order.orderId} |
+                            <strong>Name:</strong> ${order.orderName} |
+                            <strong>Value:</strong> ${order.orderVal} |
+                            <strong>Quantity:</strong> ${order.orderQuantity}
+                        </div><hr>
+                    `;
+                });
+            } catch(err){
+                console.error(err);
+                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+            }
         };
     }
 
     // ================== UPDATE ==================
     function showUpdateForm() {
         formArea.innerHTML = `
-                <h3>Update Order</h3>
-                <form id="updateForm">
-                    <input type="number" id="updateId" placeholder="Order ID" required>
-                    <input type="text" id="updateName" placeholder="New Order Name" required>
-                    <input type="number" id="updateVal" placeholder="New Order Value" required>
-                    <input type="number" id="updateQuantity" placeholder="New Quantity" required>
-                    <button type="submit">Update Order</button>
-                </form>
-            `;
+            <h3>Update Order</h3>
+            <form id="updateForm">
+                <input type="number" id="updateId" placeholder="Order ID" required>
+                <input type="text" id="updateName" placeholder="New Order Name" required>
+                <input type="number" id="updateVal" placeholder="New Order Value" min="0" required>
+                <input type="number" id="updateQuantity" placeholder="New Quantity" min="0" required>
+                <button type="submit">Update Order</button>
+            </form>
+        `;
 
-        document.getElementById("updateForm").onsubmit = function(e) {
+        document.getElementById("updateForm").onsubmit = async function(e) {
             e.preventDefault();
+            const orderId = Number(document.getElementById("updateId").value);
             const updatedOrder = {
-                orderName: document.getElementById("updateName").value,
-                orderVal: parseInt(document.getElementById("updateVal").value),
-                orderQuantity: parseInt(document.getElementById("updateQuantity").value)
+                orderName: document.getElementById("updateName").value.trim(),
+                orderVal: Number(document.getElementById("updateVal").value),
+                orderQuantity: Number(document.getElementById("updateQuantity").value)
             };
-            const orderId = parseInt(document.getElementById("updateId").value);
 
-            fetch(`${API_BASE}/${orderId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updatedOrder)
-            })
-                .then(res => res.ok ? "✅ Order updated successfully!" : "❌ Error updating order")
-                .then(msg => {
-                    output.innerText = msg;
+            if(isNaN(orderId) || !updatedOrder.orderName || isNaN(updatedOrder.orderVal) || isNaN(updatedOrder.orderQuantity)){
+                output.innerHTML = `<p style="color:red;">❌ Please fill all fields correctly.</p>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/${orderId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updatedOrder)
+                });
+
+                if(res.ok){
+                    output.innerHTML = `<p style="color:green;">✅ Order updated successfully!</p>`;
                     formArea.innerHTML = "";
-                })
-                .catch(err => output.innerText = "❌ " + err);
+                } else {
+                    const errorText = await res.text();
+                    output.innerHTML = `<p style="color:red;">❌ Error updating order: ${errorText}</p>`;
+                }
+            } catch(err){
+                console.error(err);
+                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+            }
         };
     }
 
     // ================== DELETE ==================
     function showDeleteForm() {
         formArea.innerHTML = `
-                <h3>Delete Order</h3>
-                <form id="deleteForm">
-                    <input type="number" id="deleteId" placeholder="Order ID" required>
-                    <button type="submit">Delete Order</button>
-                </form>
-            `;
+            <h3>Delete Order</h3>
+            <form id="deleteForm">
+                <input type="number" id="deleteId" placeholder="Order ID" required>
+                <button type="submit">Delete Order</button>
+            </form>
+        `;
 
-        document.getElementById("deleteForm").onsubmit = function(e) {
+        document.getElementById("deleteForm").onsubmit = async function(e) {
             e.preventDefault();
-            const id = parseInt(document.getElementById("deleteId").value);
+            const id = Number(document.getElementById("deleteId").value);
 
-            fetch(`${API_BASE}/${id}`, { method: "DELETE" })
-                .then(res => res.ok ? `✅ Order ${id} deleted successfully!` : "❌ Error deleting order")
-                .then(msg => {
-                    output.innerText = msg;
+            if(isNaN(id)){
+                output.innerHTML = `<p style="color:red;">❌ Please enter a valid Order ID.</p>`;
+                return;
+            }
+
+            if(!confirm(`Are you sure you want to delete Order ID ${id}?`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+                if(res.ok){
+                    output.innerHTML = `<p style="color:green;">✅ Order ${id} deleted successfully!</p>`;
                     formArea.innerHTML = "";
-                })
-                .catch(err => output.innerText = "❌ " + err);
+                } else {
+                    const errorText = await res.text();
+                    output.innerHTML = `<p style="color:red;">❌ Error deleting order: ${errorText}</p>`;
+                }
+            } catch(err){
+                console.error(err);
+                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+            }
         };
     }
 </script>
