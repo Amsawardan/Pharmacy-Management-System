@@ -144,11 +144,6 @@
                 orderQuantity: Number(document.getElementById("orderQuantity").value)
             };
 
-            if(!newOrder.orderName || isNaN(newOrder.orderVal) || isNaN(newOrder.orderQuantity)){
-                output.innerHTML = `<p style="color:red;">❌ Please fill all fields correctly.</p>`;
-                return;
-            }
-
             try {
                 const res = await fetch(API_BASE, {
                     method: "POST",
@@ -160,12 +155,10 @@
                     output.innerHTML = `<p style="color:green;">✅ Order created successfully!</p>`;
                     formArea.innerHTML = "";
                 } else {
-                    const errorText = await res.text();
-                    output.innerHTML = `<p style="color:red;">❌ Error creating order: ${errorText}</p>`;
+                    output.innerHTML = `<p style="color:red;">❌ Error creating order.</p>`;
                 }
-            } catch(err) {
-                console.error(err);
-                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+            } catch(err){
+                output.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
             }
         };
     }
@@ -207,8 +200,7 @@
                     `;
                 });
             } catch(err){
-                console.error(err);
-                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+                output.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
             }
         };
     }
@@ -219,6 +211,7 @@
             <h3>Update Order</h3>
             <form id="updateForm">
                 <input type="number" id="updateId" placeholder="Order ID" required>
+                <button type="button" id="fetchBtn">Fetch Order</button>
                 <input type="text" id="updateName" placeholder="New Order Name" required>
                 <input type="number" id="updateVal" placeholder="New Order Value" min="0" required>
                 <input type="number" id="updateQuantity" placeholder="New Quantity" min="0" required>
@@ -226,22 +219,44 @@
             </form>
         `;
 
+        const fetchBtn = document.getElementById("fetchBtn");
+
+        // Autofill existing order
+        fetchBtn.onclick = async () => {
+            const id = document.getElementById("updateId").value.trim();
+            if(!id){
+                output.innerHTML = `<p style="color:red;">❌ Please enter an Order ID.</p>`;
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/${id}`);
+                if(!res.ok){
+                    output.innerHTML = `<p style="color:red;">❌ Order not found.</p>`;
+                    return;
+                }
+                const data = await res.json();
+                document.getElementById("updateName").value = data.orderName;
+                document.getElementById("updateVal").value = data.orderVal;
+                document.getElementById("updateQuantity").value = data.orderQuantity;
+                output.innerHTML = `<p style="color:green;">✅ Order data fetched! You can now edit and update.</p>`;
+            } catch(err){
+                output.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
+            }
+        };
+
+        // Submit updated data
         document.getElementById("updateForm").onsubmit = async function(e) {
             e.preventDefault();
-            const orderId = Number(document.getElementById("updateId").value);
             const updatedOrder = {
+                orderId: Number(document.getElementById("updateId").value),
                 orderName: document.getElementById("updateName").value.trim(),
                 orderVal: Number(document.getElementById("updateVal").value),
                 orderQuantity: Number(document.getElementById("updateQuantity").value)
             };
 
-            if(isNaN(orderId) || !updatedOrder.orderName || isNaN(updatedOrder.orderVal) || isNaN(updatedOrder.orderQuantity)){
-                output.innerHTML = `<p style="color:red;">❌ Please fill all fields correctly.</p>`;
-                return;
-            }
-
             try {
-                const res = await fetch(`${API_BASE}/${orderId}`, {
+                const res = await fetch(API_BASE, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(updatedOrder)
@@ -251,12 +266,11 @@
                     output.innerHTML = `<p style="color:green;">✅ Order updated successfully!</p>`;
                     formArea.innerHTML = "";
                 } else {
-                    const errorText = await res.text();
-                    output.innerHTML = `<p style="color:red;">❌ Error updating order: ${errorText}</p>`;
+                    const errText = await res.text();
+                    output.innerHTML = `<p style="color:red;">❌ Error updating order: ${errText}</p>`;
                 }
             } catch(err){
-                console.error(err);
-                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+                output.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
             }
         };
     }
@@ -274,26 +288,21 @@
         document.getElementById("deleteForm").onsubmit = async function(e) {
             e.preventDefault();
             const id = Number(document.getElementById("deleteId").value);
+            if(isNaN(id)) return;
 
-            if(isNaN(id)){
-                output.innerHTML = `<p style="color:red;">❌ Please enter a valid Order ID.</p>`;
-                return;
-            }
-
-            if(!confirm(`Are you sure you want to delete Order ID ${id}?`)) return;
+            if(!confirm(`Are you sure you want to delete order #${id}?`)) return;
 
             try {
                 const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
                 if(res.ok){
-                    output.innerHTML = `<p style="color:green;">✅ Order ${id} deleted successfully!</p>`;
+                    output.innerHTML = `<p style="color:green;">✅ Order deleted successfully!</p>`;
                     formArea.innerHTML = "";
                 } else {
-                    const errorText = await res.text();
-                    output.innerHTML = `<p style="color:red;">❌ Error deleting order: ${errorText}</p>`;
+                    const errText = await res.text();
+                    output.innerHTML = `<p style="color:red;">❌ Error deleting order: ${errText}</p>`;
                 }
             } catch(err){
-                console.error(err);
-                output.innerHTML = `<p style="color:red;">❌ Network or server error: ${err.message}</p>`;
+                output.innerHTML = `<p style="color:red;">❌ Network error: ${err.message}</p>`;
             }
         };
     }
