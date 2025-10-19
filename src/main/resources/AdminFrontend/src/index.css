@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Raj Pharmacy Design System - Black & White Theme */
+
+@layer base {
+  :root {
+    /* Base Colors */
+    --background: 210 20% 98%;
+    --foreground: 200 15% 8%;
+
+    /* Card System */
+    --card: 0 0% 100%;
+    --card-foreground: 200 15% 8%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 15% 8%;
+
+    /* Primary - Black */
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 0% 20%;
+
+    /* Secondary - Dark Gray */
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted Colors */
+    --muted: 210 40% 96%;
+    --muted-foreground: 200 12% 45%;
+
+    /* Accent - Light Gray */
+    --accent: 0 0% 88%;
+    --accent-foreground: 0 0% 15%;
+
+    /* Destructive - Red for notifications and low stock */
+    --destructive: 0 100% 35%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 210 25% 88%;
+    --input: 210 25% 88%;
+    --ring: 0 0% 0%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(0 0% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    
+    /* Shadows */
+    --shadow-soft: 0 2px 15px -3px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 4px 20px -2px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 30px hsl(var(--primary-glow) / 0.3);
+    
+    /* Success & Warning - Custom colors for specific use cases */
+    --success: 120 100% 35%; /* Green for in stock */
+    --success-foreground: 0 0% 100%;
+    --warning: 60 100% 35%; /* Yellow for expired soon */
+    --warning-foreground: 0 0% 100%;
+    
+    /* Pharmacy Alert Colors - Custom colors */
+    --alert-low-stock: 0 100% 35%; /* Red for low stock */
+    --alert-expiry: 60 100% 35%; /* Yellow for expired soon */
+    --alert-success: 120 100% 35%; /* Green for in stock */
+    
+    /* Professional Grays */
+    --gray-50: 210 20% 98%;
+    --gray-100: 210 20% 94%;
+    --gray-200: 210 16% 82%;
+    --gray-300: 210 14% 71%;
+    --gray-400: 210 14% 56%;
+    --gray-500: 210 11% 43%;
+    --gray-600: 210 13% 31%;
+    --gray-700: 210 16% 20%;
+    --gray-800: 210 20% 14%;
+    --gray-900: 210 24% 10%;
+  }
+
+  .dark {
+    /* Base Colors */
+    --background: 210 24% 10%;
+    --foreground: 210 20% 98%;
+
+    /* Card System */
+    --card: 210 20% 14%;
+    --card-foreground: 210 20% 98%;
+
+    /* Popover */
+    --popover: 210 20% 14%;
+    --popover-foreground: 210 20% 98%;
+
+    /* Primary - Black */
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 0% 20%;
+
+    /* Secondary - Dark Gray */
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted Colors */
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 71%;
+
+    /* Accent - Light Gray */
+    --accent: 0 0% 88%;
+    --accent-foreground: 0 0% 15%;
+
+    /* Destructive - Red for notifications and low stock */
+    --destructive: 0 100% 35%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 0%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(0 0% 50%));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    
+    /* Shadows */
+    --shadow-soft: 0 2px 15px -3px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 4px 20px -2px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 30px hsl(var(--primary-glow) / 0.3);
+    
+    /* Success & Warning - Custom colors for specific use cases */
+    --success: 120 100% 35%; /* Green for in stock */
+    --success-foreground: 0 0% 100%;
+    --warning: 60 100% 35%; /* Yellow for expired soon */
+    --warning-foreground: 0 0% 100%;
+    
+    /* Pharmacy Alert Colors - Custom colors */
+    --alert-low-stock: 0 100% 35%; /* Red for low stock */
+    --alert-expiry: 60 100% 35%; /* Yellow for expired soon */
+    --alert-success: 120 100% 35%; /* Green for in stock */
+    
+    /* Professional Grays */
+    --gray-50: 210 20% 98%;
+    --gray-100: 210 20% 94%;
+    --gray-200: 210 16% 82%;
+    --gray-300: 210 14% 71%;
+    --gray-400: 210 14% 56%;
+    --gray-500: 210 11% 43%;
+    --gray-600: 210 13% 31%;
+    --gray-700: 210 16% 20%;
+    --gray-800: 210 20% 14%;
+    --gray-900: 210 24% 10%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
