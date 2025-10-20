@@ -141,7 +141,7 @@
             <img src="${imageUrl}" alt="${med.name}">
             <div class="medicine-info">
               <h3>${med.name}</h3>
-              <p class="price">$ ${med.price}</p>
+              <p class="price">LKR ${med.price}</p>
               <p class="stock">Stock: ${med.stock}</p>
               <p class="description">${truncateText(med.description || "No description available", 100)}</p>
               ${needsReadMore(med.description) ? `<span class="read-more">Read more</span>` : ""}
