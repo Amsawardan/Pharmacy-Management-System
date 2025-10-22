@@ -13,6 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             http
                     .csrf().disable()
+                    .headers(headers -> headers
+                            .frameOptions().disable() // Allow H2 console to work in iframe
+                    )
                     .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
             return http.build();
         }

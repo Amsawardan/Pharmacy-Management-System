@@ -34,64 +34,8 @@ export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Sample inventory data
-  const inventory = [
-    {
-      id: "MED001",
-      name: "Paracetamol 500mg",
-      category: "Pain Relief",
-      stock: 150,
-      minStock: 50,
-      price: 25.00,
-      expiry: "2025-06-15",
-      supplier: "PharmaCorp Ltd",
-      status: "in-stock",
-    },
-    {
-      id: "MED002", 
-      name: "Amoxicillin 250mg",
-      category: "Antibiotics",
-      stock: 8,
-      minStock: 20,
-      price: 85.50,
-      expiry: "2025-03-20",
-      supplier: "MediSupply Co",
-      status: "low-stock",
-    },
-    {
-      id: "MED003",
-      name: "Aspirin 100mg",
-      category: "Cardiovascular",
-      stock: 75,
-      minStock: 30,
-      price: 15.75,
-      expiry: "2024-10-05",
-      supplier: "HealthCare Inc",
-      status: "expiring-soon",
-    },
-    {
-      id: "MED004",
-      name: "Vitamin C 1000mg",
-      category: "Vitamins",
-      stock: 0,
-      minStock: 25,
-      price: 45.00,
-      expiry: "2025-12-31",
-      supplier: "VitaPlus Ltd",
-      status: "out-of-stock",
-    },
-    {
-      id: "MED005",
-      name: "Cough Syrup 100ml",
-      category: "Respiratory",
-      stock: 32,
-      minStock: 15,
-      price: 125.00,
-      expiry: "2025-08-12",
-      supplier: "PharmaCorp Ltd",
-      status: "in-stock",
-    },
-  ];
+  // Sample inventory data removed - starting with empty inventory
+  const inventory = [];
 
   const getStatusBadge = (status: string, stock: number, minStock: number) => {
     if (stock === 0) {
@@ -223,7 +167,7 @@ export default function Inventory() {
         </div>
 
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={() => window.open('http://localhost:8082/Medicine.html', '_blank')}>
             <Plus className="h-4 w-4 mr-2" />
             Add Medicine
           </Button>

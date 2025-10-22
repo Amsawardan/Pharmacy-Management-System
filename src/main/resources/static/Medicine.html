@@ -142,7 +142,7 @@
 
 <!-- Integrated JS -->
 <script>
-  const API_URL = "http://localhost:8081/api/medicines";
+    const API_URL = "http://localhost:8082/api/medicines";
 
   // Init
   document.addEventListener("DOMContentLoaded", async () => {
@@ -158,13 +158,15 @@
       name: document.getElementById("name").value,
       category: document.getElementById("category").value,
       batchNo: document.getElementById("batchNo").value,
-      stock: parseInt(document.getElementById("stock").value),
+      quantity: parseInt(document.getElementById("stock").value),
       price: parseFloat(document.getElementById("price").value),
       expiryDate: document.getElementById("expiryDate").value,
       supplierId: parseInt(document.getElementById("supplierId").value),
       description: document.getElementById("description").value,
       dosageInstructions: document.getElementById("dosageInstructions").value,
       sideEffects: document.getElementById("sideEffects").value,
+      manufacturer: "Default Manufacturer", // Add required field
+      minStockLevel: 10 // Add required field
     };
 
     await fetch(`${API_URL}/add`, {
@@ -188,7 +190,7 @@
       const li = document.createElement("li");
       li.innerHTML = `
       <div>
-        <strong>${med.name}</strong> (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}
+        <strong>${med.name}</strong> (${med.category}) - Stock: ${med.quantity}, Price: ${med.price}, Expiry: ${med.expiryDate}
       </div>
       <div class="actions">
         <button class="update-btn bg-blue-600 text-white px-2 py-1 rounded mr-2" onclick="openUpdateModal(${med.id})">Update</button>
@@ -207,7 +209,7 @@
     list.innerHTML = "";
     lowStock.forEach((med) => {
       const li = document.createElement("li");
-      li.innerHTML = `<span style="color:red; font-weight:bold;">⚠️ ${med.name}</span> - Stock: ${med.stock}`;
+      li.innerHTML = `<span style="color:red; font-weight:bold;">⚠️ ${med.name}</span> - Stock: ${med.quantity}`;
       list.appendChild(li);
     });
   }
@@ -243,7 +245,7 @@
     document.getElementById("updateName").value = med.name;
     document.getElementById("updateCategory").value = med.category;
     document.getElementById("updateBatchNo").value = med.batchNo;
-    document.getElementById("updateStock").value = med.stock;
+    document.getElementById("updateStock").value = med.quantity;
     document.getElementById("updatePrice").value = med.price;
     document.getElementById("updateExpiryDate").value = med.expiryDate;
     document.getElementById("updateSupplierId").value = med.supplierId;
@@ -263,13 +265,15 @@
       name: document.getElementById("updateName").value,
       category: document.getElementById("updateCategory").value,
       batchNo: document.getElementById("updateBatchNo").value,
-      stock: parseInt(document.getElementById("updateStock").value),
+      quantity: parseInt(document.getElementById("updateStock").value),
       price: parseFloat(document.getElementById("updatePrice").value),
       expiryDate: document.getElementById("updateExpiryDate").value,
       supplierId: parseInt(document.getElementById("updateSupplierId").value),
       description: document.getElementById("updateDescription").value,
       dosageInstructions: document.getElementById("updateDosageInstructions").value,
       sideEffects: document.getElementById("updateSideEffects").value,
+      manufacturer: "Default Manufacturer", // Add required field
+      minStockLevel: 10 // Add required field
     };
 
     await fetch(`${API_URL}/update/${id}`, {
@@ -297,7 +301,7 @@
       document.getElementById("medicineByIdResult").textContent = "Medicine not found";
     } else {
       const med = await res.json();
-      document.getElementById("medicineByIdResult").textContent = `${med.name} (${med.category}) - Stock: ${med.stock}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
+      document.getElementById("medicineByIdResult").textContent = `${med.name} (${med.category}) - Stock: ${med.quantity}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
     }
   }
 

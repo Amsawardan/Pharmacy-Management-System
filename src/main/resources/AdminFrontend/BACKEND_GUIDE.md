@@ -578,10 +578,10 @@ public class DataInitializer {
 ### 9.1 Test with Postman/curl
 ```bash
 # Get all staff
-GET http://localhost:8080/api/admin/staff
+GET http://localhost:8082/api/admin/staff
 
 # Assign staff to management area
-POST http://localhost:8080/api/admin/assign-management
+POST http://localhost:8082/api/admin/assign-management
 Content-Type: application/json
 
 {
@@ -592,7 +592,7 @@ Content-Type: application/json
 }
 
 # Get active assignments
-GET http://localhost:8080/api/admin/assignments
+GET http://localhost:8082/api/admin/assignments
 ```
 
 ## Step 10: Frontend Integration
@@ -601,7 +601,7 @@ Update your frontend to call these APIs:
 
 ```typescript
 // In your React components
-const API_BASE = 'http://localhost:8080/api/admin';
+const API_BASE = 'http://localhost:8082/api/admin';
 
 // Fetch staff list
 const fetchStaff = async () => {

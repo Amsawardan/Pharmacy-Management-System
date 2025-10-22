@@ -1,16 +1,18 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.enums.Role;
-import jakarta.persistence.*;  // for JPA annotations
+import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 @Entity
-@Table(name = "admins")
+@Table(name = "staff")
 public class Admin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer staffID;
 
     @Column(nullable = false)
@@ -22,25 +24,48 @@ public class Admin {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)  // Store enum as String (e.g., "ADMIN")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private String department;
+
+    @Column(nullable = false)
+    private LocalDateTime joinDate;
+
+    @Column
+    private LocalDateTime lastActive;
+
+    // Constructors
     public Admin() {}
 
-    public Admin(int staffID, String fullName, String username, String password, Role role) {
-        this.staffID = staffID;
+    public Admin(String fullName, String username, String password, Role role, 
+                String email, String phone, String department, LocalDateTime joinDate, 
+                LocalDateTime lastActive) {
         this.fullName = fullName;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.email = email;
+        this.phone = phone;
+        this.department = department;
+        this.joinDate = joinDate;
+        this.lastActive = lastActive;
     }
 
-    public int getStaffID() {
+    // Getters and Setters
+    public Integer getStaffID() {
         return staffID;
     }
 
-    public void setStaffID(int staffID) {
+    public void setStaffID(Integer staffID) {
         this.staffID = staffID;
     }
 
@@ -76,6 +101,46 @@ public class Admin {
         this.role = role;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public LocalDateTime getJoinDate() {
+        return joinDate;
+    }
+
+    public void setJoinDate(LocalDateTime joinDate) {
+        this.joinDate = joinDate;
+    }
+
+    public LocalDateTime getLastActive() {
+        return lastActive;
+    }
+
+    public void setLastActive(LocalDateTime lastActive) {
+        this.lastActive = lastActive;
+    }
+
     @Override
     public String toString() {
         return "Admin{" +
@@ -83,6 +148,12 @@ public class Admin {
                 ", fullName='" + fullName + '\'' +
                 ", username='" + username + '\'' +
                 ", role=" + role +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", department='" + department + '\'' +
+                ", joinDate=" + joinDate +
+                ", lastActive=" + lastActive +
                 '}';
     }
 }
+

@@ -7,7 +7,6 @@ import com.Pharmacy_Management_System.Raj_Pharmacy.repository.MedicineRepository
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -22,6 +21,9 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Data initialization disabled - starting with empty medicine table
+        // Uncomment the lines below if you want to load sample medicine data
+        /*
         addOrUpdateMedicine("Ibuprofen", "Painkiller", "IB1234", 200, 5.75, 2, 15L,
                 "Used for pain relief and inflammation reduction.",
                 "Take 200-400 mg every 4-6 hours as needed. Do not exceed 1200 mg per day.",
@@ -48,34 +50,36 @@ public class DataLoader implements CommandLineRunner {
                 "Side effects may include allergic reactions such as rash, itching, or swelling.");
 
         System.out.println("Mock medicines added/updated.");
+        */
     }
 
     private void addOrUpdateMedicine(String name, String category, String batchNo,
                                      int stock, double price, int expiryYears, Long supplierId,
                                      String description, String dosage, String sideEffects) {
 
-        // Check if medicine already exists using batchNo (assumed unique)                           fun() changed(29/9)
-        Medicine med = medicineRepository.findByBatchNo(batchNo);
+        // Check if medicine already exists using batchNo
+        Optional<Medicine> existingMed = medicineRepository.findAll().stream()
+                .filter(m -> batchNo.equals(m.getBatchNo()))
+                .findFirst();
 
-        if (med != null) {
+        Medicine med;
+        if (existingMed.isPresent()) {
+            med = existingMed.get();
             System.out.println("Updating medicine with batch " + batchNo);
         } else {
             med = new Medicine();
             System.out.println("Creating medicine with batch " + batchNo);
         }
 
-
         med.setName(name);
         med.setCategory(category);
         med.setBatchNo(batchNo);
-        med.setStock(stock);
-        med.setPrice(BigDecimal.valueOf(price));
+        med.setQuantity(stock);
+        med.setPrice(price);
         med.setExpiryDate(LocalDate.now().plusYears(expiryYears));
-        med.setSupplierId(supplierId);
-        med.setDeleted(false);
         med.setDescription(description);
-        med.setDosageInstructions(dosage);
-        med.setSideEffects(sideEffects);
+        med.setManufacturer("Generic Manufacturer");
+        med.setMinStockLevel(50); // Set a default minimum stock level
 
         medicineRepository.save(med);
     }
