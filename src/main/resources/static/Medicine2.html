@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raj Pharmacy | Medicine Store</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2a9d8f;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .medicine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .medicine-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s;
+        }
+
+        .medicine-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .medicine-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .medicine-info {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .medicine-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.2em;
+            color: #264653;
+        }
+
+        .price {
+            color: #e76f51;
+            font-weight: bold;
+        }
+
+        .stock {
+            color: #2a9d8f;
+            font-size: 0.9em;
+        }
+
+        .description {
+            margin-top: 8px;
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.4em;
+            max-height: 60px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .description.expanded {
+            max-height: none;
+        }
+
+        .read-more {
+            color: #0077cc;
+            cursor: pointer;
+            display: block;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .order-btn {
+            background-color: #264653;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .order-btn:hover {
+            background-color: #2a9d8f;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>💊 Raj Pharmacy</h1>
+    <p>Available Medicines</p>
+</header>
+
+<main>
+    <div id="medicine-container" class="medicine-grid">
+        <!-- Medicines will be dynamically added here -->
+    </div>
+</main>
+
+<script>
+    const API_URL = "http://localhost:8081/api/medicines/list";
+    const container = document.getElementById("medicine-container");
+
+    // Fetch and display medicines
+    async function loadMedicines() {
+        try {
+            const response = await fetch(API_URL);
+            const medicines = await response.json();
+
+            container.innerHTML = "";
+            medicines.forEach(med => {
+                const card = document.createElement("div");
+                card.classList.add("medicine-card");
+
+                // Placeholder image (replace later if backend has image field)
+                const imageUrl = "https://cdn-icons-png.flaticon.com/512/2966/2966327.png";
+
+                card.innerHTML = `
+            <img src="${imageUrl}" alt="${med.name}">
+            <div class="medicine-info">
+              <h3>${med.name}</h3>
+              <p class="price">LKR ${med.price}</p>
+              <p class="stock">Stock: ${med.stock}</p>
+              <p class="description">${truncateText(med.description || "No description available", 100)}</p>
+              ${needsReadMore(med.description) ? `<span class="read-more">Read more</span>` : ""}
+            </div>
+            <a class="order-btn" href="order2.html?medicineId=${med.id}">🛒 Order</a>
+          `;
+
+                container.appendChild(card);
+            });
+
+            // Add “Read more” toggle after rendering
+            document.querySelectorAll(".read-more").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const desc = e.target.previousElementSibling;
+                    desc.classList.toggle("expanded");
+                    e.target.textContent = desc.classList.contains("expanded") ? "Show less" : "Read more";
+                });
+            });
+
+        } catch (error) {
+            console.error("Error loading medicines:", error);
+            container.innerHTML = "<p style='color:red;text-align:center;'>Failed to load medicines. Check backend.</p>";
+        }
+    }
+
+    function truncateText(text, length) {
+        if (!text) return "";
+        return text.length > length ? text.substring(0, length) + "..." : text;
+    }
+
+    function needsReadMore(text) {
+        return text && text.length > 100;
+    }
+
+    document.addEventListener("DOMContentLoaded", loadMedicines);
+</script>
+</body>
+</html>
