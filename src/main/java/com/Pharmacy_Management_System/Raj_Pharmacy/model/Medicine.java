@@ -37,18 +37,18 @@ public class Medicine {
     @Column(nullable = false)
     private Boolean deleted = false;
 
-    // Prescription or general description
+    // Prescription or description
     @Column(nullable = true, length = 2000)
     private String description;
 
-    // New fields
+
     @Column(nullable = true, length = 2000)
     private String dosageInstructions;
 
     @Column(nullable = true, length = 2000)
     private String sideEffects;
 
-    // Image URL for the medicine (relative path under static resources)
+    // Image for the medicine
     @Column(nullable = true, length = 1000)
     private String imageUrl;
 }

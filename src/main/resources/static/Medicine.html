@@ -34,7 +34,7 @@
       top: -0.5rem;
       left: 0.5rem;
       font-size: 0.75rem;
-      color: #ffc107; /* yellow highlight */
+      color: #2a9d8f;
       background: #ffffff;
       padding: 0 4px;
       border-radius: 4px;
@@ -44,10 +44,10 @@
 <body class="bg-white font-sans text-black min-h-screen flex justify-center items-start py-10">
 
 <div class="w-full max-w-5xl bg-white rounded-2xl p-8 shadow-2xl border border-gray-300">
-  <h1 class="text-3xl font-bold text-center text-[#ffc107] mb-8 animate-fadeIn">Raj Pharmacy - Medicine Management</h1>
+  <h1 class="text-3xl font-bold text-center text-[#2a9d8f] mb-8 animate-fadeIn">Raj Pharmacy - Medicine Management</h1>
 
   <!-- Add Medicine -->
-  <h2 class="text-2xl font-semibold text-[#ffc107] mb-6">Add Medicine</h2>
+  <h2 class="text-2xl font-semibold text-[#2a9d8f] mb-6">Add Medicine</h2>
   <form id="medicineForm" class="grid grid-cols-2 gap-6" enctype="multipart/form-data">
     <div class="float-label">
       <input type="text" id="name" placeholder=" " required class="w-full rounded-lg px-3 py-2" />
@@ -93,11 +93,11 @@
       <label class="block mb-2">Medicine Image (optional)</label>
       <input type="file" id="imageFile" accept="image/*" class="w-full" />
     </div>
-    <button type="submit" class="col-span-2 bg-[#ffc107] text-black font-bold py-3 rounded-lg shadow hover:shadow-lg hover:scale-105 transform transition">Add Medicine</button>
+    <button type="submit" class="col-span-2 bg-[#2a9d8f] text-black font-bold py-3 rounded-lg shadow hover:shadow-lg hover:scale-105 transform transition">Add Medicine</button>
   </form>
 
   <!-- Alerts -->
-  <h2 class="text-2xl font-semibold text-[#ffc107] mt-10 mb-4">Alerts</h2>
+  <h2 class="text-2xl font-semibold text-[#2a9d8f] mt-10 mb-4">Alerts</h2>
   <div id="lowStockAlert" class="bg-yellow-100 border border-yellow-400 rounded p-4 mb-4">
     <h3 class="font-bold text-yellow-700">Low Stock Medicines</h3>
     <ul id="lowStockList" class="list-disc pl-6"></ul>
@@ -108,11 +108,11 @@
   </div>
 
   <!-- Medicine List -->
-  <h2 class="text-2xl font-semibold text-[#ffc107] mb-4">All Medicines</h2>
+  <h2 class="text-2xl font-semibold text-[#2a9d8f] mb-4">All Medicines</h2>
   <ul id="medicineList" class="space-y-3"></ul>
 
   <!-- Get Medicine By ID -->
-  <h2 class="text-2xl font-semibold text-[#ffc107] mt-10 mb-4">Find Medicine by ID</h2>
+  <h2 class="text-2xl font-semibold text-[#2a9d8f] mt-10 mb-4">Find Medicine by ID</h2>
   <div class="flex space-x-3 mb-6">
     <input type="number" id="medicineIdInput" placeholder="Enter ID" class="w-40 px-3 py-2 rounded-lg bg-gray-100 border border-gray-400 text-black" />
     <button onclick="getMedicineById()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition">Search</button>
@@ -124,7 +124,7 @@
 <div id="updateModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
   <div class="bg-white p-6 rounded-xl shadow-xl w-[500px] border border-gray-300">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-[#ffc107]">Update Medicine</h2>
+      <h2 class="text-xl font-bold text-[#2a9d8f]">Update Medicine</h2>
       <span class="close cursor-pointer text-red-500 text-2xl">&times;</span>
     </div>
     <form id="updateForm" class="grid grid-cols-2 gap-4" enctype="multipart/form-data">

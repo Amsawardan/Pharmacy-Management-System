@@ -23,7 +23,8 @@ public class MedicineController {
     @Autowired
     private MedicineService medicineService;
 
-    @PostMapping("/add")                                                  //create
+    //create
+    @PostMapping("/add")
     public ResponseEntity<?> addMedicine(@RequestBody Medicine medicine) {
         try {
             Medicine saved = medicineService.addMedicine(medicine);
@@ -33,23 +34,24 @@ public class MedicineController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
-    @GetMapping("/list")                                                 //reade full list
+    //reade full list
+    @GetMapping("/list")
     public ResponseEntity<List<Medicine>> getAllMedicines() {
         return ResponseEntity.ok(medicineService.getAllMedicines());
     }
-
-    @GetMapping("/low-stock")                                            //reade low_stock
+    //reade low_stock
+    @GetMapping("/low-stock")
     public ResponseEntity<List<Medicine>> getLowStockMedicines() {
         return ResponseEntity.ok(medicineService.getLowStockMedicines());
     }
-
-    @GetMapping("/expired")                                               //reade expired
+    //reade expired
+    @GetMapping("/expired")
     public ResponseEntity<List<Medicine>> getExpiredMedicines() {
         return ResponseEntity.ok(medicineService.getExpiredMedicines());
     }
 
-    // New endpoint to fetch medicine details by id
-    @GetMapping("/{id}")                                                 //reade medicine by ID
+    //reade medicine by ID
+    @GetMapping("/{id}")
     public ResponseEntity<Medicine> getMedicineById(@PathVariable Long id) {
         Optional<Medicine> medicine = medicineService.getMedicineById(id);
         if (medicine.isPresent()) {
@@ -58,19 +60,19 @@ public class MedicineController {
             return ResponseEntity.status(404).body(null);
         }
     }
-
-    @PutMapping("/update/{id}")                                           //update
+    //update
+    @PutMapping("/update/{id}")
     public ResponseEntity<Medicine> updateMedicine(@PathVariable Long id, @RequestBody Medicine medicine) {
         return ResponseEntity.ok(medicineService.updateMedicine(id, medicine));
     }
-
-    @DeleteMapping("/delete/{id}")                                       //delete
+    //delete
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteMedicine(@PathVariable Long id) {
         medicineService.deleteMedicine(id);
         return ResponseEntity.ok("Medicine deleted successfully");
     }
 
-    // Upload image for a medicine
+    //add image for a medicine
     @PostMapping(value = "/upload/{id}")
     public ResponseEntity<?> uploadImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
         try {
