@@ -5,12 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Raj Pharmacy | Orders</title>
     <style>
-        body { font-family:'Poppins',sans-serif; background:#f9f9f9; margin:0; padding:0; }
-        header { background:#2a9d8f; color:white; text-align:center; padding:20px 0; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-        .order-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; padding:30px;}
-        .order-card { background:#fff; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,0.1); padding:15px; }
-        .order-card h3 { margin:0 0 8px; color:#264653; }
-        .order-details { font-size:0.9em; color:#555; margin:2px 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2a9d8f;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .order-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .order-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+        .order-card h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #264653;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-details {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .items-container {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s ease;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 0;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.95em;
+        }
+        .toggle-btn {
+            font-size: 0.9em;
+            color: #0077cc;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-weight: bold;
+            margin-top: 8px;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -20,7 +76,7 @@
 </header>
 
 <main>
-    <div id="order-container" class="order-grid"></div>
+    <div id="order-container" class="order-container"></div>
 </main>
 
 <script>
@@ -41,19 +97,41 @@
                 const card = document.createElement("div");
                 card.classList.add("order-card");
 
-                let itemsHTML = "";
+                const itemsContainer = document.createElement("div");
+                itemsContainer.classList.add("items-container");
+
                 if (order.items && order.items.length > 0) {
                     order.items.forEach(item => {
-                        itemsHTML += `<p class="order-details">💊 ${item.medicineName} x${item.quantity} = LKR ${item.price * item.quantity}</p>`;
+                        const itemDiv = document.createElement("div");
+                        itemDiv.classList.add("item");
+                        itemDiv.innerHTML = `
+                            <span>💊 ${item.medicineName} x${item.quantity}</span>
+                            <span>LKR ${item.price * item.quantity}</span>
+                        `;
+                        itemsContainer.appendChild(itemDiv);
                     });
                 }
 
+                const toggleBtn = document.createElement("button");
+                toggleBtn.classList.add("toggle-btn");
+                toggleBtn.textContent = "Show Items";
+                toggleBtn.addEventListener("click", () => {
+                    if (itemsContainer.style.maxHeight === "0px" || itemsContainer.style.maxHeight === "") {
+                        itemsContainer.style.maxHeight = itemsContainer.scrollHeight + "px";
+                        toggleBtn.textContent = "Hide Items";
+                    } else {
+                        itemsContainer.style.maxHeight = "0px";
+                        toggleBtn.textContent = "Show Items";
+                    }
+                });
+
                 card.innerHTML = `
-                    <h3>Order ID: ${order.orderId}</h3>
+                    <h3>Order ID: ${order.orderId} <span>LKR ${order.orderVal}</span></h3>
                     <p class="order-details">Total Items: ${order.orderQuantity}</p>
-                    <p class="order-details">Total Value: LKR ${order.orderVal}</p>
-                    ${itemsHTML}
                 `;
+                card.appendChild(toggleBtn);
+                card.appendChild(itemsContainer);
+
                 container.appendChild(card);
             });
 
