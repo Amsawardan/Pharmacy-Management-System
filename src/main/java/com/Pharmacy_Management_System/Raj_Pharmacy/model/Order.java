@@ -3,6 +3,8 @@ package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Entity
 @Table(name = "orders")
@@ -15,45 +17,39 @@ public class Order {
     private int orderVal;
     private int orderQuantity;
 
-    public Order() {
-    }
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
 
-    public Order(int orderId, String orderName, int orderVal, int orderQuantity) {
+    public Order() {}
+
+    public Order(int orderId, String orderName, int orderVal, int orderQuantity, List<OrderItem> items) {
         this.orderId = orderId;
         this.orderName = orderName;
         this.orderVal = orderVal;
         this.orderQuantity = orderQuantity;
+        this.items = items;
     }
 
-    public int getOrderId() {
-        return orderId;
-    }
+    // Getters and setters
+    public int getOrderId() { return orderId; }
+    public void setOrderId(int orderId) { this.orderId = orderId; }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
+    public String getOrderName() { return orderName; }
+    public void setOrderName(String orderName) { this.orderName = orderName; }
 
-    public String getOrderName() {
-        return orderName;
-    }
+    public int getOrderVal() { return orderVal; }
+    public void setOrderVal(int orderVal) { this.orderVal = orderVal; }
 
-    public void setOrderName(String orderName) {
-        this.orderName = orderName;
-    }
+    public int getOrderQuantity() { return orderQuantity; }
+    public void setOrderQuantity(int orderQuantity) { this.orderQuantity = orderQuantity; }
 
-    public int getOrderVal() {
-        return orderVal;
-    }
-
-    public void setOrderVal(int orderVal) {
-        this.orderVal = orderVal;
-    }
-
-    public int getOrderQuantity() {
-        return orderQuantity;
-    }
-
-    public void setOrderQuantity(int orderQuantity) {
-        this.orderQuantity = orderQuantity;
+    public List<OrderItem> getItems() { return items; }
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+        if (items != null) {
+            for (OrderItem item : items) {
+                item.setOrder(this);
+            }
+        }
     }
 }

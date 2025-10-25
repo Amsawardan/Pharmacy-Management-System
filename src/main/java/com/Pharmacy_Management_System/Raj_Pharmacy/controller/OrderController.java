@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins="*")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
     @Autowired
-    OrderService orderservice;
+    private OrderService orderservice;
 
     @GetMapping("/orders")
     public List<Order> getOrders() {
@@ -25,17 +25,17 @@ public class OrderController {
     }
 
     @PostMapping("/orders")
-    public void addOrder(@RequestBody Order order){
-        orderservice.addOrder( order);
+    public void addOrder(@RequestBody Order order) {
+        orderservice.addOrder(order);
     }
 
     @PutMapping("/orders")
-    public void updateOrder(@RequestBody Order order){
+    public void updateOrder(@RequestBody Order order) {
         orderservice.updateOrder(order);
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public void deleteOrder(@PathVariable int orderId){
+    public void deleteOrder(@PathVariable int orderId) {
         orderservice.deleteOrder(orderId);
     }
 }
