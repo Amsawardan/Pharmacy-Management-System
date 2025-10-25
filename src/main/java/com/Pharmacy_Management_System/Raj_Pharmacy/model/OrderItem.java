@@ -1,5 +1,6 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +17,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private Order order;
 
     public OrderItem() {}
@@ -26,7 +28,7 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    // Getters and setters
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

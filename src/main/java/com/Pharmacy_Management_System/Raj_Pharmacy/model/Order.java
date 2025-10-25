@@ -1,5 +1,6 @@
 package com.Pharmacy_Management_System.Raj_Pharmacy.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,13 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
+
     private String orderName;
     private int orderVal;
     private int orderQuantity;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<OrderItem> items;
 
     public Order() {}
@@ -27,10 +30,10 @@ public class Order {
         this.orderName = orderName;
         this.orderVal = orderVal;
         this.orderQuantity = orderQuantity;
-        this.items = items;
+        this.setItems(items);
     }
 
-    // Getters and setters
+    // Getters and Setters
     public int getOrderId() { return orderId; }
     public void setOrderId(int orderId) { this.orderId = orderId; }
 
