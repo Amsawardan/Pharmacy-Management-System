@@ -105,6 +105,15 @@
           font-size: 0.9rem;
           margin-top: 10px;
         }
+        .success-message {
+          background: rgba(72, 187, 120, 0.1);
+          color: #2f855a;
+          padding: 10px;
+          border-radius: 8px;
+          display: none;
+          font-size: 0.9rem;
+          margin-top: 10px;
+        }
         .tab-links {
           display: flex;
           justify-content: space-around;
@@ -191,6 +200,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                     <div id="signupError" class="error-message"></div>
+                    <div id="signupSuccess" class="success-message"></div>
                 </form>
                 <p class="mt-3 text-center">
                     Already have an account?
@@ -243,10 +253,10 @@
     // USER LOGIN/SIGNUP SWITCH
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
-    document.getElementById("switchToSignup").onclick = e => {e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block";}
-    document.getElementById("switchToLogin").onclick = e => {e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block";}
+    document.getElementById("switchToSignup").onclick = e => {e.preventDefault(); loginForm.style.display="none"; signupForm.style.display="block";};
+    document.getElementById("switchToLogin").onclick = e => {e.preventDefault(); signupForm.style.display="none"; loginForm.style.display="block";};
 
-    // SIGNUP
+    // SIGNUP (modified)
     document.getElementById("signup").onsubmit = async e => {
       e.preventDefault();
       const user = {
@@ -256,25 +266,43 @@
         address: document.getElementById("signupAddress").value.trim(),
       };
       const errorBox = document.getElementById("signupError");
+      const successBox = document.getElementById("signupSuccess");
       errorBox.style.display = "none";
+      successBox.style.display = "none";
 
-      if(!user.name||!user.email||!user.password||!user.address){
-        errorBox.textContent="Please fill all fields!";
-        errorBox.style.display="block";
+      if(!user.name || !user.email || !user.password || !user.address){
+        errorBox.textContent = "Please fill all fields!";
+        errorBox.style.display = "block";
         return;
       }
+
       try {
-        const res = await fetch(API_BASE,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(user)});
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user)
+        });
+
         if(res.ok){
-          const newUser = {...user,id:Date.now(),role:"user"};
-          localStorage.setItem("loggedInUser",JSON.stringify(newUser));
-          window.location.href="http://localhost:8082/medicine2.html";
-        }else{
+          successBox.textContent = "Signup successful! Please log in now.";
+          successBox.style.display = "block";
+
+          // Clear form
+          document.getElementById("signup").reset();
+
+          // Switch to login after a short delay
+          setTimeout(() => {
+            signupForm.style.display = "none";
+            loginForm.style.display = "block";
+          }, 2000);
+        } else {
           const msg = await res.text();
-          errorBox.textContent = msg || "Signup failed"; errorBox.style.display="block";
+          errorBox.textContent = msg || "Signup failed";
+          errorBox.style.display = "block";
         }
       } catch(err){
-        errorBox.textContent="Network error"; errorBox.style.display="block";
+        errorBox.textContent = "Network error";
+        errorBox.style.display = "block";
       }
     };
 
@@ -286,14 +314,18 @@
       const errorBox=document.getElementById("loginError"); errorBox.style.display="none";
 
       try {
-        const res = await fetch(API_BASE); if(!res.ok) throw new Error("Failed to fetch users");
+        const res = await fetch(API_BASE);
+        if(!res.ok) throw new Error("Failed to fetch users");
         const users = await res.json();
         const user = users.find(u=>u.email===email&&u.password===password);
         if(!user){errorBox.textContent="Invalid email or password"; errorBox.style.display="block"; return;}
         if(user.role==="admin"){errorBox.textContent="Access denied: Use Admin tab"; errorBox.style.display="block"; return;}
         localStorage.setItem("loggedInUser",JSON.stringify(user));
         window.location.href="http://localhost:8082/medicine2.html";
-      } catch(err){errorBox.textContent="Error logging in"; errorBox.style.display="block";}
+      } catch(err){
+        errorBox.textContent="Error logging in";
+        errorBox.style.display="block";
+      }
     };
 
     // ADMIN LOGIN
@@ -304,14 +336,18 @@
       const errorBox=document.getElementById("adminError"); errorBox.style.display="none";
 
       try {
-        const res=await fetch(API_BASE); if(!res.ok) throw new Error("Failed to fetch users");
+        const res=await fetch(API_BASE);
+        if(!res.ok) throw new Error("Failed to fetch users");
         const users=await res.json();
         const user = users.find(u=>u.email===email&&u.password===password);
         if(!user){errorBox.textContent="Invalid email or password"; errorBox.style.display="block"; return;}
         if(user.role!=="admin"){errorBox.textContent="Access denied: Only admins"; errorBox.style.display="block"; return;}
         localStorage.setItem("loggedInUser",JSON.stringify(user));
         window.location.href="http://localhost:8082/admin/dashboard.html";
-      } catch(err){errorBox.textContent="Error logging in"; errorBox.style.display="block";}
+      } catch(err){
+        errorBox.textContent="Error logging in";
+        errorBox.style.display="block";
+      }
     };
 </script>
 </body>
