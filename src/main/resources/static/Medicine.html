@@ -14,8 +14,8 @@
     .float-label input,
     .float-label textarea {
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #f1f1f1;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      color: #000;
     }
     .float-label label {
       position: absolute;
@@ -23,7 +23,7 @@
       left: 0.75rem;
       transform: translateY(-50%);
       transition: all 0.2s ease;
-      color: #bbb;
+      color: #555;
       pointer-events: none;
       font-size: 0.9rem;
     }
@@ -35,20 +35,20 @@
       left: 0.5rem;
       font-size: 0.75rem;
       color: #ffc107; /* yellow highlight */
-      background: #1e1f22;
+      background: #ffffff;
       padding: 0 4px;
       border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-[#1e1f22] font-sans text-white min-h-screen flex justify-center items-start py-10">
+<body class="bg-white font-sans text-black min-h-screen flex justify-center items-start py-10">
 
-<div class="w-full max-w-5xl bg-[#2a2b2e] rounded-2xl p-8 shadow-2xl border border-gray-700">
+<div class="w-full max-w-5xl bg-white rounded-2xl p-8 shadow-2xl border border-gray-300">
   <h1 class="text-3xl font-bold text-center text-[#ffc107] mb-8 animate-fadeIn">Raj Pharmacy - Medicine Management</h1>
 
   <!-- Add Medicine -->
   <h2 class="text-2xl font-semibold text-[#ffc107] mb-6">Add Medicine</h2>
-  <form id="medicineForm" class="grid grid-cols-2 gap-6">
+  <form id="medicineForm" class="grid grid-cols-2 gap-6" enctype="multipart/form-data">
     <div class="float-label">
       <input type="text" id="name" placeholder=" " required class="w-full rounded-lg px-3 py-2" />
       <label for="name">Name</label>
@@ -89,17 +89,21 @@
       <textarea id="sideEffects" placeholder=" " class="w-full rounded-lg px-3 py-2"></textarea>
       <label for="sideEffects">Side Effects</label>
     </div>
+    <div class="col-span-2 float-label">
+      <label class="block mb-2">Medicine Image (optional)</label>
+      <input type="file" id="imageFile" accept="image/*" class="w-full" />
+    </div>
     <button type="submit" class="col-span-2 bg-[#ffc107] text-black font-bold py-3 rounded-lg shadow hover:shadow-lg hover:scale-105 transform transition">Add Medicine</button>
   </form>
 
   <!-- Alerts -->
   <h2 class="text-2xl font-semibold text-[#ffc107] mt-10 mb-4">Alerts</h2>
-  <div id="lowStockAlert" class="bg-yellow-900/40 border border-yellow-600 rounded p-4 mb-4">
-    <h3 class="font-bold text-yellow-400">Low Stock Medicines</h3>
+  <div id="lowStockAlert" class="bg-yellow-100 border border-yellow-400 rounded p-4 mb-4">
+    <h3 class="font-bold text-yellow-700">Low Stock Medicines</h3>
     <ul id="lowStockList" class="list-disc pl-6"></ul>
   </div>
-  <div id="expiredAlert" class="bg-red-900/40 border border-red-600 rounded p-4 mb-6">
-    <h3 class="font-bold text-red-400">Expired Medicines</h3>
+  <div id="expiredAlert" class="bg-red-100 border border-red-400 rounded p-4 mb-6">
+    <h3 class="font-bold text-red-700">Expired Medicines</h3>
     <ul id="expiredList" class="list-disc pl-6"></ul>
   </div>
 
@@ -110,20 +114,20 @@
   <!-- Get Medicine By ID -->
   <h2 class="text-2xl font-semibold text-[#ffc107] mt-10 mb-4">Find Medicine by ID</h2>
   <div class="flex space-x-3 mb-6">
-    <input type="number" id="medicineIdInput" placeholder="Enter ID" class="w-40 px-3 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white" />
+    <input type="number" id="medicineIdInput" placeholder="Enter ID" class="w-40 px-3 py-2 rounded-lg bg-gray-100 border border-gray-400 text-black" />
     <button onclick="getMedicineById()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition">Search</button>
   </div>
-  <div id="medicineByIdResult" class="p-4 bg-gray-800 border border-gray-700 rounded"></div>
+  <div id="medicineByIdResult" class="p-4 bg-gray-100 border border-gray-300 rounded"></div>
 </div>
 
 <!-- Update Modal -->
 <div id="updateModal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
-  <div class="bg-[#2a2b2e] p-6 rounded-xl shadow-xl w-[500px] border border-gray-600">
+  <div class="bg-white p-6 rounded-xl shadow-xl w-[500px] border border-gray-300">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold text-[#ffc107]">Update Medicine</h2>
       <span class="close cursor-pointer text-red-500 text-2xl">&times;</span>
     </div>
-    <form id="updateForm" class="grid grid-cols-2 gap-4">
+    <form id="updateForm" class="grid grid-cols-2 gap-4" enctype="multipart/form-data">
       <input type="hidden" id="updateId" />
       <div class="float-label"><input type="text" id="updateName" placeholder=" " required class="w-full px-2 py-1 rounded" /><label for="updateName">Name</label></div>
       <div class="float-label"><input type="text" id="updateCategory" placeholder=" " required class="w-full px-2 py-1 rounded" /><label for="updateCategory">Category</label></div>
@@ -135,6 +139,10 @@
       <div class="col-span-2 float-label"><textarea id="updateDescription" placeholder=" " class="w-full px-2 py-1 rounded"></textarea><label for="updateDescription">Description</label></div>
       <div class="col-span-2 float-label"><textarea id="updateDosageInstructions" placeholder=" " class="w-full px-2 py-1 rounded"></textarea><label for="updateDosageInstructions">Dosage Instructions</label></div>
       <div class="col-span-2 float-label"><textarea id="updateSideEffects" placeholder=" " class="w-full px-2 py-1 rounded"></textarea><label for="updateSideEffects">Side Effects</label></div>
+      <div class="col-span-2 float-label">
+        <label class="block mb-2">Replace Image (optional)</label>
+        <input type="file" id="updateImageFile" accept="image/*" class="w-full" />
+      </div>
       <button type="submit" class="col-span-2 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Update Medicine</button>
     </form>
   </div>
@@ -142,7 +150,7 @@
 
 <!-- Integrated JS -->
 <script>
-    const API_URL = "http://localhost:8082/api/medicines";
+  const API_URL = "http://localhost:8081/api/medicines";
 
   // Init
   document.addEventListener("DOMContentLoaded", async () => {
@@ -158,22 +166,33 @@
       name: document.getElementById("name").value,
       category: document.getElementById("category").value,
       batchNo: document.getElementById("batchNo").value,
-      quantity: parseInt(document.getElementById("stock").value),
+      stock: parseInt(document.getElementById("stock").value),
       price: parseFloat(document.getElementById("price").value),
       expiryDate: document.getElementById("expiryDate").value,
       supplierId: parseInt(document.getElementById("supplierId").value),
       description: document.getElementById("description").value,
       dosageInstructions: document.getElementById("dosageInstructions").value,
       sideEffects: document.getElementById("sideEffects").value,
-      manufacturer: "Default Manufacturer", // Add required field
-      minStockLevel: 10 // Add required field
     };
 
-    await fetch(`${API_URL}/add`, {
+    // Create medicine first
+    const res = await fetch(`${API_URL}/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(medicine)
     });
+    const created = await res.json();
+
+    // If image file selected, upload it
+    const fileInput = document.getElementById('imageFile');
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      const fd = new FormData();
+      fd.append('image', fileInput.files[0]);
+      await fetch(`${API_URL}/upload/${created.id}`, {
+        method: 'POST',
+        body: fd
+      });
+    }
 
     alert("Medicine Added!");
     document.getElementById("medicineForm").reset();
@@ -188,13 +207,22 @@
     list.innerHTML = "";
     medicines.forEach((med) => {
       const li = document.createElement("li");
+      const imgSrc = med.imageUrl ? med.imageUrl : 'https://cdn-icons-png.flaticon.com/512/2966/2966327.png';
       li.innerHTML = `
-      <div>
-        <strong>${med.name}</strong> (${med.category}) - Stock: ${med.quantity}, Price: ${med.price}, Expiry: ${med.expiryDate}
-      </div>
-      <div class="actions">
-        <button class="update-btn bg-blue-600 text-white px-2 py-1 rounded mr-2" onclick="openUpdateModal(${med.id})">Update</button>
-        <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded" onclick="deleteMedicine(${med.id})">Delete</button>
+      <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+        <div class="flex items-center">
+          <img src="${imgSrc}" alt="${med.name}" class="w-16 h-16 object-cover rounded mr-4" />
+          <div>
+            <strong class="block">${med.name}</strong>
+            <span class="text-sm text-gray-600">(${med.category})</span>
+            <div class="text-sm">Stock: ${med.stock} | Price: ${med.price}</div>
+            <div class="text-xs text-gray-500">Expiry: ${med.expiryDate}</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="update-btn bg-blue-600 text-white px-2 py-1 rounded mr-2" onclick="openUpdateModal(${med.id})">Update</button>
+          <button class="delete-btn bg-red-600 text-white px-2 py-1 rounded" onclick="deleteMedicine(${med.id})">Delete</button>
+        </div>
       </div>
     `;
       list.appendChild(li);
@@ -209,7 +237,7 @@
     list.innerHTML = "";
     lowStock.forEach((med) => {
       const li = document.createElement("li");
-      li.innerHTML = `<span style="color:red; font-weight:bold;">⚠️ ${med.name}</span> - Stock: ${med.quantity}`;
+      li.innerHTML = `<span style="color:red; font-weight:bold;">⚠️ ${med.name}</span> - Stock: ${med.stock}`;
       list.appendChild(li);
     });
   }
@@ -240,12 +268,11 @@
     const res = await fetch(`${API_URL}/${id}`);
     const med = await res.json();
 
-    // fill modal form
     document.getElementById("updateId").value = med.id;
     document.getElementById("updateName").value = med.name;
     document.getElementById("updateCategory").value = med.category;
     document.getElementById("updateBatchNo").value = med.batchNo;
-    document.getElementById("updateStock").value = med.quantity;
+    document.getElementById("updateStock").value = med.stock;
     document.getElementById("updatePrice").value = med.price;
     document.getElementById("updateExpiryDate").value = med.expiryDate;
     document.getElementById("updateSupplierId").value = med.supplierId;
@@ -256,7 +283,7 @@
     document.getElementById("updateModal").style.display = "flex";
   }
 
-  //  Submit Update Form
+  // Submit Update Form
   document.getElementById("updateForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -265,15 +292,13 @@
       name: document.getElementById("updateName").value,
       category: document.getElementById("updateCategory").value,
       batchNo: document.getElementById("updateBatchNo").value,
-      quantity: parseInt(document.getElementById("updateStock").value),
+      stock: parseInt(document.getElementById("updateStock").value),
       price: parseFloat(document.getElementById("updatePrice").value),
       expiryDate: document.getElementById("updateExpiryDate").value,
       supplierId: parseInt(document.getElementById("updateSupplierId").value),
       description: document.getElementById("updateDescription").value,
       dosageInstructions: document.getElementById("updateDosageInstructions").value,
       sideEffects: document.getElementById("updateSideEffects").value,
-      manufacturer: "Default Manufacturer", // Add required field
-      minStockLevel: 10 // Add required field
     };
 
     await fetch(`${API_URL}/update/${id}`, {
@@ -281,6 +306,17 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(medicine)
     });
+
+    // If image file selected, upload it
+    const fileInput = document.getElementById('updateImageFile');
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      const fd = new FormData();
+      fd.append('image', fileInput.files[0]);
+      await fetch(`${API_URL}/upload/${id}`, {
+        method: 'POST',
+        body: fd
+      });
+    }
 
     alert("Medicine updated!");
     document.getElementById("updateModal").style.display = "none";
@@ -301,7 +337,17 @@
       document.getElementById("medicineByIdResult").textContent = "Medicine not found";
     } else {
       const med = await res.json();
-      document.getElementById("medicineByIdResult").textContent = `${med.name} (${med.category}) - Stock: ${med.quantity}, Price: ${med.price}, Expiry: ${med.expiryDate}`;
+      const imgSrc = med.imageUrl ? med.imageUrl : 'https://cdn-icons-png.flaticon.com/512/2966/2966327.png';
+      document.getElementById("medicineByIdResult").innerHTML = `
+        <div class="flex items-center">
+          <img src="${imgSrc}" alt="${med.name}" class="w-24 h-24 object-cover rounded mr-4" />
+          <div>
+            <div><strong>${med.name}</strong> (${med.category})</div>
+            <div>Stock: ${med.stock} | Price: ${med.price}</div>
+            <div>Expiry: ${med.expiryDate}</div>
+          </div>
+        </div>
+      `;
     }
   }
 

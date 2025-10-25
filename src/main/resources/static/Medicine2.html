@@ -135,7 +135,7 @@
                 card.classList.add("medicine-card");
 
                 // Placeholder image (replace later if backend has image field)
-                const imageUrl = "https://cdn-icons-png.flaticon.com/512/2966/2966327.png";
+                const imageUrl = med.imageUrl ? med.imageUrl : "https://cdn-icons-png.flaticon.com/512/2966/2966327.png";
 
                 card.innerHTML = `
             <img src="${imageUrl}" alt="${med.name}">

@@ -15,69 +15,53 @@ public class MedicineService {
     @Autowired
     private MedicineRepository medicineRepository;
 
-    // Add new medicine
     public Medicine addMedicine(Medicine medicine) {
+        medicine.setDeleted(false);
         return medicineRepository.save(medicine);
     }
 
-    // Get all medicines
-    public List<Medicine> getAllMedicines() {
-        return medicineRepository.findAll();
-    }
-
-    // Get medicine by ID
-    public Optional<Medicine> getMedicineById(Long id) {
-        return medicineRepository.findById(id);
-    }
-
-    // Update medicine
-    public Medicine updateMedicine(Long id, Medicine medicine) {
-        if (medicineRepository.existsById(id)) {
-            medicine.setId(id);
+    public Medicine updateMedicine(Long id, Medicine medicineDetails) {
+        Optional<Medicine> optionalMedicine = medicineRepository.findById(id);
+        if (optionalMedicine.isPresent()) {
+            Medicine medicine = optionalMedicine.get();
+            medicine.setName(medicineDetails.getName());
+            medicine.setBatchNo(medicineDetails.getBatchNo());
+            medicine.setStock(medicineDetails.getStock());
+            medicine.setPrice(medicineDetails.getPrice());
+            medicine.setExpiryDate(medicineDetails.getExpiryDate());
+            medicine.setSupplierId(medicineDetails.getSupplierId());
+            medicine.setDescription(medicineDetails.getDescription());  // Handle description update
             return medicineRepository.save(medicine);
         }
-        return null;
+        throw new RuntimeException("Medicine not found with id " + id);
     }
 
-    // Delete medicine
     public void deleteMedicine(Long id) {
-        medicineRepository.deleteById(id);
+        Optional<Medicine> optionalMedicine = medicineRepository.findById(id);
+        if (optionalMedicine.isPresent()) {
+            Medicine medicine = optionalMedicine.get();
+            medicine.setDeleted(true);
+            medicineRepository.save(medicine);
+        } else {
+            throw new RuntimeException("Medicine not found with id " + id);
+        }
     }
 
-    // Get low stock medicines
+    public List<Medicine> getAllMedicines() {
+        return medicineRepository.findByDeletedFalse();
+    }
+
     public List<Medicine> getLowStockMedicines() {
-        return medicineRepository.findLowStockMedicines();
+        return medicineRepository.findByStockLessThanAndDeletedFalse(5);
     }
 
-    // Get expired medicines
+    // Modified this method to pass LocalDate.now() to findExpiredMedicines
     public List<Medicine> getExpiredMedicines() {
-        return medicineRepository.findExpiredMedicines(LocalDate.now());
+        return medicineRepository.findExpiredMedicines(LocalDate.now()); // Pass the current date as argument
     }
 
-    // Get medicines expiring soon (within 30 days)
-    public List<Medicine> getMedicinesExpiringSoon() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate futureDate = currentDate.plusDays(30);
-        return medicineRepository.findMedicinesExpiringSoon(currentDate, futureDate);
-    }
-
-    // Search medicines by name
-    public List<Medicine> searchByName(String searchTerm) {
-        return medicineRepository.searchByName(searchTerm);
-    }
-
-    // Get medicines by category
-    public List<Medicine> getMedicinesByCategory(String category) {
-        return medicineRepository.findByCategory(category);
-    }
-
-    // Get medicines by manufacturer
-    public List<Medicine> getMedicinesByManufacturer(String manufacturer) {
-        return medicineRepository.findByManufacturer(manufacturer);
-    }
-
-    // Get medicines by price range
-    public List<Medicine> getMedicinesByPriceRange(Double minPrice, Double maxPrice) {
-        return medicineRepository.findByPriceRange(minPrice, maxPrice);
+    // New method to get medicine by id
+    public Optional<Medicine> getMedicineById(Long id) {
+        return medicineRepository.findById(id);
     }
 }
