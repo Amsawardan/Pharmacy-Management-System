@@ -37,10 +37,8 @@ public class Medicine {
     @Column(nullable = false)
     private Boolean deleted = false;
 
-    // Prescription or description
     @Column(nullable = true, length = 2000)
     private String description;
-
 
     @Column(nullable = true, length = 2000)
     private String dosageInstructions;

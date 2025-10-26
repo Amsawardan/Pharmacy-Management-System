@@ -2,12 +2,15 @@ package com.Pharmacy_Management_System.Raj_Pharmacy.service;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.Medicine;
 import com.Pharmacy_Management_System.Raj_Pharmacy.repository.MedicineRepository;
+import com.Pharmacy_Management_System.Raj_Pharmacy.dto.StockDecreaseRequest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicineService {
@@ -19,6 +22,24 @@ public class MedicineService {
         medicine.setDeleted(false);
         return medicineRepository.save(medicine);
     }
+    /**
+     * Decrease stock for multiple medicines atomically.
+     * - Ensures stock never goes below 0.
+     * - Runs inside a transaction to avoid partial updates.
+     */
+    @Transactional
+    public List<Medicine> decreaseStockBulk(List<StockDecreaseRequest> requests) {
+        for (StockDecreaseRequest r : requests) {
+            medicineRepository.findById(r.getId()).ifPresent(m -> {
+                int dec = r.getQuantity() == null ? 0 : r.getQuantity();
+                int newStock = Math.max(0, m.getStock() - dec);
+                m.setStock(newStock);
+                medicineRepository.save(m);
+            });
+        }
+        List<Long> ids = requests.stream().map(StockDecreaseRequest::getId).collect(Collectors.toList());
+        return medicineRepository.findAllById(ids);
+    }
 
     public Medicine updateMedicine(Long id, Medicine medicineDetails) {
         Optional<Medicine> optionalMedicine = medicineRepository.findById(id);
@@ -29,7 +50,6 @@ public class MedicineService {
             medicine.setStock(medicineDetails.getStock());
             medicine.setPrice(medicineDetails.getPrice());
             medicine.setExpiryDate(medicineDetails.getExpiryDate());
-            medicine.setSupplierId(medicineDetails.getSupplierId());
             medicine.setDescription(medicineDetails.getDescription());  // Handle description update
             return medicineRepository.save(medicine);
         }

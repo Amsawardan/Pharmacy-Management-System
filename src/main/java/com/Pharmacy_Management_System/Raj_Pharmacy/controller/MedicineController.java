@@ -2,6 +2,7 @@ package com.Pharmacy_Management_System.Raj_Pharmacy.controller;
 
 import com.Pharmacy_Management_System.Raj_Pharmacy.model.Medicine;
 import com.Pharmacy_Management_System.Raj_Pharmacy.service.MedicineService;
+import com.Pharmacy_Management_System.Raj_Pharmacy.dto.StockDecreaseRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +72,12 @@ public class MedicineController {
         medicineService.deleteMedicine(id);
         return ResponseEntity.ok("Medicine deleted successfully");
     }
-
+    // atomically decreases the
+    @PostMapping("/decrease")
+    public ResponseEntity<List<Medicine>> decreaseStock(@RequestBody List<StockDecreaseRequest> requests) {
+        List<Medicine> updated = medicineService.decreaseStockBulk(requests);
+        return ResponseEntity.ok(updated);
+    }
     //add image for a medicine
     @PostMapping(value = "/upload/{id}")
     public ResponseEntity<?> uploadImage(@PathVariable Long id, @RequestParam("image") MultipartFile image) {
@@ -81,8 +87,6 @@ public class MedicineController {
                 return ResponseEntity.status(404).body("Medicine not found");
             }
             Medicine med = opt.get();
-
-            // Ensure images directory exists under resources/static/images
             File imagesDir = new File("src/main/resources/static/images");
             if (!imagesDir.exists()) imagesDir.mkdirs();
 
@@ -92,7 +96,7 @@ public class MedicineController {
 
             Files.copy(image.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
-            // Set imageUrl to be accessible under /images/{filename}
+            // Set imageUrl
             String imageUrl = "/images/" + safeName;
             med.setImageUrl(imageUrl);
             medicineService.addMedicine(med); // save

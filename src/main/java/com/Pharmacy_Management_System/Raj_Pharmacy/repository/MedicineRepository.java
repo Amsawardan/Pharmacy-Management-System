@@ -15,7 +15,6 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
     List<Medicine> findByDeletedFalse();
 
-    // <<< Add this method here >>>
     Medicine findByBatchNo(String batchNo);
 }
 
