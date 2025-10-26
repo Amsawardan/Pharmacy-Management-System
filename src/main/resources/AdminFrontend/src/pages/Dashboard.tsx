@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   DollarSign, 
   Package, 
@@ -20,6 +21,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [totalStaff, setTotalStaff] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [totalMedicines, setTotalMedicines] = useState<number>(0);
@@ -161,7 +163,11 @@ export default function Dashboard() {
       {/* Metrics Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric, index) => (
-          <MetricCard key={index} {...metric} />
+          <MetricCard 
+            key={index} 
+            {...metric} 
+            onClick={metric.title === "Total Users" ? () => navigate('/users') : undefined}
+          />
         ))}
       </div>
 

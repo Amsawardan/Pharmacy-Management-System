@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import Prescriptions from "./pages/Prescriptions";
 import Staff from "./pages/Staff";
+import Users from "./pages/Users";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="inventory" element={<Inventory />} />
             <Route path="orders" element={<Prescriptions />} />
             <Route path="staff" element={<Staff />} />
+            <Route path="users" element={<Users />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
           </Route>

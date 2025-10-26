@@ -13,6 +13,7 @@ interface MetricCardProps {
   };
   className?: string;
   variant?: "default" | "success" | "warning" | "destructive";
+  onClick?: () => void;
 }
 
 export function MetricCard({
@@ -23,6 +24,7 @@ export function MetricCard({
   trend,
   className,
   variant = "default",
+  onClick,
 }: MetricCardProps) {
   const variantStyles = {
     default: "border-border",
@@ -32,7 +34,10 @@ export function MetricCard({
   };
 
   return (
-    <Card className={cn("transition-all duration-200 hover:shadow-card", variantStyles[variant], className)}>
+    <Card 
+      className={cn("transition-all duration-200 hover:shadow-card", variantStyles[variant], className, onClick && "cursor-pointer")}
+      onClick={onClick}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
