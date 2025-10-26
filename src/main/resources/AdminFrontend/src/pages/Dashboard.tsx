@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { 
   DollarSign, 
   Package, 
   Users, 
-  TrendingUp,
+  UserCheck,
+  UserCircle,
   AlertTriangle,
   Calendar,
   Clock,
@@ -18,6 +20,36 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
+  const [totalStaff, setTotalStaff] = useState<number>(0);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch staff statistics
+      const staffResponse = await fetch('http://localhost:8082/admin/statistics');
+      if (staffResponse.ok) {
+        const staffStats = await staffResponse.json();
+        setTotalStaff(staffStats.total || 0);
+      }
+
+      // Fetch users data
+      const usersResponse = await fetch('http://localhost:8082/user');
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json();
+        setTotalUsers(usersData.length || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Sample data - in real app, this would come from API
   const metrics = [
     {
@@ -36,18 +68,16 @@ export default function Dashboard() {
       trend: { value: 5, isPositive: false },
     },
     {
-      title: "Active Staff",
-      value: "12",
-      description: "8 on duty, 4 off duty",
-      icon: <Users className="h-4 w-4" />,
+      title: "Total Staff",
+      value: loading ? "..." : totalStaff.toString(),
+      description: "All staff members",
+      icon: <UserCheck className="h-4 w-4" />,
     },
     {
-      title: "Monthly Revenue",
-      value: "LKR 2.8M",
-      description: "Target: LKR 3.2M",
-      icon: <TrendingUp className="h-4 w-4" />,
-      trend: { value: 8, isPositive: true },
-      variant: "success" as const,
+      title: "Total Users",
+      value: loading ? "..." : totalUsers.toString(),
+      description: "All registered users",
+      icon: <UserCircle className="h-4 w-4" />,
     },
   ];
 
@@ -59,11 +89,6 @@ export default function Dashboard() {
       icon: <AlertTriangle className="h-5 w-5" />,
       actionText: "View Low Stock",
       severity: "medium" as const, // Red for low stock
-      items: [
-        { name: "Paracetamol 500mg", detail: "5 remaining" },
-        { name: "Amoxicillin 250mg", detail: "3 remaining" },
-        { name: "Ibuprofen 400mg", detail: "8 remaining" },
-      ],
     },
     {
       title: "Expiry Alert",
@@ -72,11 +97,6 @@ export default function Dashboard() {
       icon: <Calendar className="h-5 w-5" />,
       actionText: "View Expiring Items",
       severity: "low" as const, // Yellow for expired soon
-      items: [
-        { name: "Aspirin 100mg", detail: "Expires in 5 days" },
-        { name: "Vitamin C", detail: "Expires in 10 days" },
-        { name: "Cough Syrup", detail: "Expires in 15 days" },
-      ],
     },
     {
       title: "Pending Orders",
@@ -85,11 +105,6 @@ export default function Dashboard() {
       icon: <FileText className="h-5 w-5" />,
       actionText: "Review Orders",
       severity: "low" as const,
-      items: [
-        { name: "Order #ORD001", detail: "Kamal Silva" },
-        { name: "Order #ORD002", detail: "Sita Perera" },
-        { name: "Order #ORD003", detail: "Ruwan Jayasinghe" },
-      ],
     },
   ];
 
