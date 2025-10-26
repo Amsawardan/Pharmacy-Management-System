@@ -1,14 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Package, 
   Search, 
   Plus, 
   Filter, 
   AlertTriangle, 
-  Calendar,
-  Edit,
-  Trash2,
-  Eye
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,9 +30,40 @@ import {
 export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [medicines, setMedicines] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample inventory data removed - starting with empty inventory
-  const inventory = [];
+  useEffect(() => {
+    fetchMedicines();
+  }, []);
+
+  const fetchMedicines = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:8082/api/medicines/list');
+      if (response.ok) {
+        const medicinesData = await response.json();
+        setMedicines(medicinesData);
+      }
+    } catch (error) {
+      console.error('Error fetching medicines:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const inventory = medicines.map(med => ({
+    id: med.id,
+    name: med.name,
+    category: med.category,
+    stock: med.stock || 0,
+    minStock: 10, // Assuming min stock level
+    price: med.price || 0,
+    expiry: med.expiryDate || 'N/A',
+    supplier: `Supplier ID: ${med.supplierId || 'N/A'}`,
+    status: med.stock > 10 ? 'in-stock' : med.stock > 0 ? 'low-stock' : 'out-of-stock',
+    batchNo: med.batchNo || 'N/A'
+  }));
 
   const getStatusBadge = (status: string, stock: number, minStock: number) => {
     if (stock === 0) {
@@ -50,9 +78,14 @@ export default function Inventory() {
   };
 
   const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = 
+      item.name.toLowerCase().includes(searchLower) ||
+      item.id.toString().includes(searchLower) ||
+      item.category.toLowerCase().includes(searchLower) ||
+      item.batchNo.toLowerCase().includes(searchLower) ||
+      item.supplier.toLowerCase().includes(searchLower);
+    const matchesCategory = categoryFilter === "all" || item.category.toLowerCase() === categoryFilter.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
@@ -63,6 +96,9 @@ export default function Inventory() {
     outOfStock: inventory.filter(item => item.stock === 0).length,
     expiringSoon: inventory.filter(item => item.status === "expiring-soon").length,
   };
+
+  // Get unique categories from medicines
+  const uniqueCategories = Array.from(new Set(inventory.map(item => item.category))).sort();
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -157,25 +193,19 @@ export default function Inventory() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Pain Relief">Pain Relief</SelectItem>
-              <SelectItem value="Antibiotics">Antibiotics</SelectItem>
-              <SelectItem value="Cardiovascular">Cardiovascular</SelectItem>
-              <SelectItem value="Vitamins">Vitamins</SelectItem>
-              <SelectItem value="Respiratory">Respiratory</SelectItem>
+              {uniqueCategories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="flex gap-2">
-          <Button onClick={() => window.open('http://localhost:8082/Medicine.html', '_blank')}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Medicine
-          </Button>
-          <Button variant="outline">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
-          </Button>
-        </div>
+        <Button onClick={() => window.open('http://localhost:8082/Medicine.html', '_blank')}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Medicine
+        </Button>
       </div>
 
       {/* Inventory Table */}
@@ -198,44 +228,49 @@ export default function Inventory() {
                   <TableHead>Price (LKR)</TableHead>
                   <TableHead>Expiry Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>Batch No</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredInventory.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-muted/30">
-                    <TableCell className="font-medium">{item.id}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.supplier}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{item.stock}</p>
-                        <p className="text-xs text-muted-foreground">Min: {item.minStock}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{item.price.toFixed(2)}</TableCell>
-                    <TableCell>{item.expiry}</TableCell>
-                    <TableCell>{getStatusBadge(item.status, item.stock, item.minStock)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <span className="ml-3 text-muted-foreground">Loading medicines...</span>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : filteredInventory.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      No medicines found. Add medicines to get started.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredInventory.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-muted/30">
+                      <TableCell className="font-medium">{item.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">{item.supplier}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{item.stock}</p>
+                          <p className="text-xs text-muted-foreground">Min: {item.minStock}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>LKR {item.price.toFixed(2)}</TableCell>
+                      <TableCell>{item.expiry}</TableCell>
+                      <TableCell>{getStatusBadge(item.status, item.stock, item.minStock)}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{item.batchNo}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
