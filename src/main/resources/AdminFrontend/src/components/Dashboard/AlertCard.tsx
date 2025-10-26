@@ -10,7 +10,7 @@ interface AlertCardProps {
   count: number;
   description: string;
   icon: ReactNode;
-  actionText: string;
+  actionText?: string;
   onAction: () => void;
   severity: "low" | "medium" | "high";
   items?: Array<{
@@ -74,15 +74,17 @@ export function AlertCard({
             )}
           </div>
           
-          <Button 
-            onClick={onAction}
-            className="w-full"
-            variant="outline"
-            size="sm"
-          >
-            {actionText}
-            <ArrowRight className="ml-2 h-3 w-3" />
-          </Button>
+          {actionText && (
+            <Button 
+              onClick={onAction}
+              className="w-full"
+              variant="outline"
+              size="sm"
+            >
+              {actionText}
+              <ArrowRight className="ml-2 h-3 w-3" />
+            </Button>
+          )}
         </CardContent>
       )}
     </Card>

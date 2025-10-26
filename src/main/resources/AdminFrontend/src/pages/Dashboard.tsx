@@ -23,6 +23,8 @@ export default function Dashboard() {
   const [totalStaff, setTotalStaff] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [totalMedicines, setTotalMedicines] = useState<number>(0);
+  const [lowStockMedicines, setLowStockMedicines] = useState<any[]>([]);
+  const [expiredMedicines, setExpiredMedicines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,6 +52,20 @@ export default function Dashboard() {
       if (medicinesResponse.ok) {
         const medicinesData = await medicinesResponse.json();
         setTotalMedicines(medicinesData.length || 0);
+      }
+
+      // Fetch low stock medicines
+      const lowStockResponse = await fetch('http://localhost:8082/api/medicines/low-stock');
+      if (lowStockResponse.ok) {
+        const lowStockData = await lowStockResponse.json();
+        setLowStockMedicines(lowStockData || []);
+      }
+
+      // Fetch expired medicines
+      const expiredResponse = await fetch('http://localhost:8082/api/medicines/expired');
+      if (expiredResponse.ok) {
+        const expiredData = await expiredResponse.json();
+        setExpiredMedicines(expiredData || []);
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -91,26 +107,16 @@ export default function Dashboard() {
   const alerts = [
     {
       title: "Low Stock Alert",
-      count: 15,
+      count: lowStockMedicines.length,
       description: "Medicines running low",
       icon: <AlertTriangle className="h-5 w-5" />,
-      actionText: "View Low Stock",
-      severity: "medium" as const, // Red for low stock
+      severity: "medium" as const,
     },
     {
       title: "Expiry Alert",
-      count: 8,
+      count: expiredMedicines.length,
       description: "Medicines expiring soon",
       icon: <Calendar className="h-5 w-5" />,
-      actionText: "View Expiring Items",
-      severity: "low" as const, // Yellow for expired soon
-    },
-    {
-      title: "Pending Orders",
-      count: 6,
-      description: "Awaiting approval",
-      icon: <FileText className="h-5 w-5" />,
-      actionText: "Review Orders",
       severity: "low" as const,
     },
   ];
@@ -163,12 +169,12 @@ export default function Dashboard() {
         {/* Alerts */}
         <div className="space-y-4 md:col-span-2">
           <h2 className="text-xl font-semibold text-primary">System Alerts</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             {alerts.map((alert, index) => (
               <AlertCard
                 key={index}
                 {...alert}
-                onAction={() => console.log(`Action for ${alert.title}`)}
+                onAction={() => {}}
               />
             ))}
           </div>
