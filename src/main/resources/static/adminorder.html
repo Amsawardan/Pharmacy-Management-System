@@ -70,18 +70,39 @@
         .update-btn { color: #2a9d8f; margin-right: 10px; }
         .delete-btn { color: #e76f51; }
 
-        .order-input {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
+        /* Modal Styles */
+        .modal, .confirm-modal {
+            position: fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.6);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index: 1000;
         }
-        .order-input input {
-            padding: 5px 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 0.9em;
-            flex: 1;
+        .modal-content, .confirm-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 400px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
         }
+        .modal-content h3, .confirm-content h3 { margin-top:0; }
+        .modal-content .item-edit { display:flex; justify-content:space-between; margin:8px 0; gap:5px; }
+        .modal-content input { padding:5px; font-size:0.9em; border-radius:6px; border:1px solid #ccc; width: 48%; }
+        .modal-content button { margin-top:10px; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+        .save-btn { background:#2a9d8f; color:white; }
+        .save-btn:hover { background:#21867a; }
+        .cancel-btn { background:#ccc; color:#333; margin-left:10px; }
+        .cancel-btn:hover { background:#aaa; }
+        .modal-total { font-weight:bold; margin-top:10px; text-align:right; font-size:1.1em; }
+
+        .confirm-content button { padding:8px 12px; margin:10px 5px 0 0; border:none; border-radius:6px; font-weight:bold; cursor:pointer; }
+        .confirm-yes { background:#e76f51; color:white; }
+        .confirm-no { background:#ccc; color:#333; }
     </style>
 </head>
 <body>
@@ -94,11 +115,43 @@
     <div id="order-container" class="order-container"></div>
 </main>
 
+<!-- Update Modal -->
+<div class="modal" id="update-modal">
+    <div class="modal-content" id="update-modal-content">
+        <h3>Edit Order</h3>
+        <div>
+            <label>Address:</label>
+            <input type="text" id="modal-address" placeholder="Enter address">
+        </div>
+        <div>
+            <label>Contact Number:</label>
+            <input type="text" id="modal-contact" placeholder="Enter contact number">
+        </div>
+        <div id="modal-items-container"></div>
+        <div class="modal-total">Total: LKR <span id="modal-total-value">0</span></div>
+        <button class="save-btn" id="save-update">Save</button>
+        <button class="cancel-btn" id="cancel-update">Cancel</button>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="confirm-modal" id="delete-modal">
+    <div class="confirm-content">
+        <h3>Are you sure you want to delete this order?</h3>
+        <button class="confirm-yes" id="confirm-delete-yes">Yes</button>
+        <button class="confirm-no" id="confirm-delete-no">No</button>
+    </div>
+</div>
+
 <script>
+    let orders = [];
+    let currentEditOrder = null;
+    let currentDeleteOrderId = null;
+
     async function loadOrders() {
         try {
             const res = await fetch("http://localhost:8082/orders");
-            const orders = await res.json();
+            orders = await res.json();
             const container = document.getElementById("order-container");
             container.innerHTML = "";
 
@@ -139,66 +192,25 @@
                     }
                 });
 
-                // Address and Contact Inputs
-                const orderInputsDiv = document.createElement("div");
-                orderInputsDiv.classList.add("order-input");
-                const addressInput = document.createElement("input");
-                addressInput.type = "text";
-                addressInput.value = order.address || "N/A";
-                addressInput.placeholder = "Enter address";
-                const contactInput = document.createElement("input");
-                contactInput.type = "text";
-                contactInput.value = order.contactNumber || "N/A";
-                contactInput.placeholder = "Enter contact number";
-                orderInputsDiv.appendChild(addressInput);
-                orderInputsDiv.appendChild(contactInput);
-
-                // Update and Delete buttons
                 const updateBtn = document.createElement("button");
                 updateBtn.classList.add("update-btn");
                 updateBtn.textContent = "Update";
-                updateBtn.addEventListener("click", async () => {
-                    const updatedOrder = {
-                        ...order,
-                        address: addressInput.value.trim(),
-                        contactNumber: contactInput.value.trim()
-                    };
-                    try {
-                        await fetch(`http://localhost:8082/orders`, {
-                            method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(updatedOrder)
-                        });
-                        alert("Order updated successfully!");
-                        loadOrders();
-                    } catch (err) {
-                        console.error(err);
-                        alert("Failed to update order.");
-                    }
-                });
+                updateBtn.addEventListener("click", () => openUpdateModal(order));
 
                 const deleteBtn = document.createElement("button");
                 deleteBtn.classList.add("delete-btn");
                 deleteBtn.textContent = "Delete";
-                deleteBtn.addEventListener("click", async () => {
-                    if (!confirm("Are you sure you want to delete this order?")) return;
-                    try {
-                        await fetch(`http://localhost:8082/orders/${order.orderId}`, { method: "DELETE" });
-                        alert("Order deleted successfully!");
-                        loadOrders();
-                    } catch (err) {
-                        console.error(err);
-                        alert("Failed to delete order.");
-                    }
-                });
+                deleteBtn.addEventListener("click", () => openDeleteModal(order.orderId));
 
                 card.innerHTML = `
                     <h3>Order ID: ${order.orderId} <span>LKR ${order.orderVal}</span></h3>
                     <p class="order-details">Total Items: ${order.orderQuantity}</p>
+                    <p class="order-details">📍 Address: ${order.address || 'N/A'}</p>
+                    <p class="order-details">📞 Contact: ${order.contactNumber || 'N/A'}</p>
                 `;
+
                 card.appendChild(toggleBtn);
                 card.appendChild(itemsContainer);
-                card.appendChild(orderInputsDiv);
                 card.appendChild(updateBtn);
                 card.appendChild(deleteBtn);
 
@@ -209,6 +221,104 @@
             document.getElementById("order-container").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Failed to load orders.</p>";
         }
     }
+
+    // Update Modal Functions
+    const updateModal = document.getElementById("update-modal");
+    const modalAddress = document.getElementById("modal-address");
+    const modalContact = document.getElementById("modal-contact");
+    const modalItemsContainer = document.getElementById("modal-items-container");
+    const saveUpdateBtn = document.getElementById("save-update");
+    const cancelUpdateBtn = document.getElementById("cancel-update");
+    const modalTotalValue = document.getElementById("modal-total-value");
+
+    function openUpdateModal(order) {
+        currentEditOrder = JSON.parse(JSON.stringify(order)); // deep copy
+        modalAddress.value = currentEditOrder.address || "";
+        modalContact.value = currentEditOrder.contactNumber || "";
+
+        modalItemsContainer.innerHTML = "";
+        currentEditOrder.items.forEach((item, index) => {
+            const div = document.createElement("div");
+            div.className = "item-edit";
+            div.innerHTML = `
+                <input type="text" value="${item.medicineName}" data-index="${index}" class="item-name">
+                <input type="number" min="1" value="${item.quantity}" data-index="${index}" class="item-qty">
+            `;
+            modalItemsContainer.appendChild(div);
+        });
+        updateModalTotal();
+        updateModal.style.display = "flex";
+
+        // Attach change listeners for dynamic total
+        const qtyInputs = modalItemsContainer.querySelectorAll(".item-qty");
+        qtyInputs.forEach(input => {
+            input.addEventListener("input", updateModalTotal);
+        });
+    }
+
+    function updateModalTotal() {
+        const names = modalItemsContainer.querySelectorAll(".item-name");
+        const qtys = modalItemsContainer.querySelectorAll(".item-qty");
+        let total = 0;
+        names.forEach((input, i) => {
+            const qty = parseInt(qtys[i].value) || 0;
+            total += (currentEditOrder.items[i].price * qty);
+        });
+        modalTotalValue.textContent = total;
+    }
+
+    // Save Updates
+    saveUpdateBtn.onclick = async () => {
+        currentEditOrder.address = modalAddress.value.trim();
+        currentEditOrder.contactNumber = modalContact.value.trim();
+
+        const names = modalItemsContainer.querySelectorAll(".item-name");
+        const qtys = modalItemsContainer.querySelectorAll(".item-qty");
+        names.forEach((input, i) => {
+            currentEditOrder.items[i].medicineName = input.value.trim();
+            currentEditOrder.items[i].quantity = parseInt(qtys[i].value);
+        });
+
+        try {
+            await fetch("http://localhost:8082/orders", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(currentEditOrder)
+            });
+            updateModal.style.display = "none";
+            alert("Order updated successfully!");
+            loadOrders();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update order.");
+        }
+    };
+
+    cancelUpdateBtn.onclick = () => { updateModal.style.display = "none"; };
+
+    // Delete Modal Functions
+    const deleteModal = document.getElementById("delete-modal");
+    const confirmYesBtn = document.getElementById("confirm-delete-yes");
+    const confirmNoBtn = document.getElementById("confirm-delete-no");
+
+    function openDeleteModal(orderId) {
+        currentDeleteOrderId = orderId;
+        deleteModal.style.display = "flex";
+    }
+
+    confirmYesBtn.onclick = async () => {
+        try {
+            await fetch(`http://localhost:8082/orders/${currentDeleteOrderId}`, { method: "DELETE" });
+            deleteModal.style.display = "none";
+            alert("Order deleted successfully!");
+            loadOrders();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete order.");
+        }
+    };
+
+    confirmNoBtn.onclick = () => { deleteModal.style.display = "none"; };
 
     document.addEventListener("DOMContentLoaded", loadOrders);
 </script>
