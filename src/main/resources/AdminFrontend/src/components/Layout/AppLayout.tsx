@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { Menu, X, Bell, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,6 +17,13 @@ import { ThemeSwitch } from "@/components/ui/theme-switch";
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem('loggedInUser');
+    // Redirect to login page
+    window.location.href = 'http://localhost:8082/login.html';
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,23 +82,17 @@ export function AppLayout() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Kethieswaran</p>
+                    <p className="text-sm font-medium leading-none">Admin</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      admin@rajpharmacy.com
+                      amsan12@gmail.com
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem 
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
