@@ -232,51 +232,53 @@
     const modalTotalValue = document.getElementById("modal-total-value");
 
     function openUpdateModal(order) {
-        currentEditOrder = JSON.parse(JSON.stringify(order)); // deep copy
+        currentEditOrder = JSON.parse(JSON.stringify(order));
         modalAddress.value = currentEditOrder.address || "";
         modalContact.value = currentEditOrder.contactNumber || "";
-
         modalItemsContainer.innerHTML = "";
-        currentEditOrder.items.forEach((item, index) => {
+        currentEditOrder.items.forEach((item, idx) => {
             const div = document.createElement("div");
             div.className = "item-edit";
             div.innerHTML = `
-                <input type="text" value="${item.medicineName}" data-index="${index}" class="item-name">
-                <input type="number" min="1" value="${item.quantity}" data-index="${index}" class="item-qty">
+                <input type="text" class="item-name" value="${item.medicineName}" />
+                <input type="number" class="item-qty" value="${item.quantity}" min="1" />
             `;
             modalItemsContainer.appendChild(div);
         });
         updateModalTotal();
         updateModal.style.display = "flex";
 
-        // Attach change listeners for dynamic total
-        const qtyInputs = modalItemsContainer.querySelectorAll(".item-qty");
-        qtyInputs.forEach(input => {
+        // Attach change listeners for quantity/name inputs
+        modalItemsContainer.querySelectorAll(".item-name, .item-qty").forEach((input, idx) => {
             input.addEventListener("input", updateModalTotal);
         });
     }
 
     function updateModalTotal() {
+        let total = 0;
         const names = modalItemsContainer.querySelectorAll(".item-name");
         const qtys = modalItemsContainer.querySelectorAll(".item-qty");
-        let total = 0;
-        names.forEach((input, i) => {
-            const qty = parseInt(qtys[i].value) || 0;
-            total += (currentEditOrder.items[i].price * qty);
+        names.forEach((input, idx) => {
+            const qty = parseInt(qtys[idx].value) || 0;
+            const price = currentEditOrder.items[idx].price;
+            total += price * qty;
         });
         modalTotalValue.textContent = total;
     }
 
-    // Save Updates
     saveUpdateBtn.onclick = async () => {
         currentEditOrder.address = modalAddress.value.trim();
         currentEditOrder.contactNumber = modalContact.value.trim();
 
         const names = modalItemsContainer.querySelectorAll(".item-name");
         const qtys = modalItemsContainer.querySelectorAll(".item-qty");
+        currentEditOrder.orderQuantity = 0;
+        currentEditOrder.orderVal = 0;
         names.forEach((input, i) => {
             currentEditOrder.items[i].medicineName = input.value.trim();
             currentEditOrder.items[i].quantity = parseInt(qtys[i].value);
+            currentEditOrder.orderQuantity += currentEditOrder.items[i].quantity;
+            currentEditOrder.orderVal += currentEditOrder.items[i].price * currentEditOrder.items[i].quantity;
         });
 
         try {
@@ -287,7 +289,27 @@
             });
             updateModal.style.display = "none";
             alert("Order updated successfully!");
-            loadOrders();
+
+            // Update card in DOM dynamically
+            const card = [...document.querySelectorAll(".order-card")]
+                .find(c => c.querySelector("h3").textContent.includes(`Order ID: ${currentEditOrder.orderId}`));
+            if (card) {
+                card.querySelector("h3 span").textContent = `LKR ${currentEditOrder.orderVal}`;
+                card.querySelector(".order-details").textContent = `Total Items: ${currentEditOrder.orderQuantity}`;
+                card.querySelectorAll(".order-details")[1].textContent = `📍 Address: ${currentEditOrder.address || 'N/A'}`;
+                card.querySelectorAll(".order-details")[2].textContent = `📞 Contact: ${currentEditOrder.contactNumber || 'N/A'}`;
+                const itemsContainer = card.querySelector(".items-container");
+                itemsContainer.innerHTML = "";
+                currentEditOrder.items.forEach(item => {
+                    const itemDiv = document.createElement("div");
+                    itemDiv.classList.add("item");
+                    itemDiv.innerHTML = `
+                        <span>💊 ${item.medicineName} x${item.quantity}</span>
+                        <span>LKR ${item.price * item.quantity}</span>
+                    `;
+                    itemsContainer.appendChild(itemDiv);
+                });
+            }
         } catch (err) {
             console.error(err);
             alert("Failed to update order.");
@@ -295,30 +317,32 @@
     };
 
     cancelUpdateBtn.onclick = () => { updateModal.style.display = "none"; };
+    updateModal.onclick = e => { if (e.target === updateModal) updateModal.style.display = "none"; };
 
     // Delete Modal Functions
     const deleteModal = document.getElementById("delete-modal");
-    const confirmYesBtn = document.getElementById("confirm-delete-yes");
-    const confirmNoBtn = document.getElementById("confirm-delete-no");
+    const confirmYes = document.getElementById("confirm-delete-yes");
+    const confirmNo = document.getElementById("confirm-delete-no");
 
     function openDeleteModal(orderId) {
         currentDeleteOrderId = orderId;
         deleteModal.style.display = "flex";
     }
 
-    confirmYesBtn.onclick = async () => {
+    confirmYes.onclick = async () => {
         try {
             await fetch(`http://localhost:8082/orders/${currentDeleteOrderId}`, { method: "DELETE" });
             deleteModal.style.display = "none";
             alert("Order deleted successfully!");
-            loadOrders();
+            await loadOrders();
         } catch (err) {
             console.error(err);
             alert("Failed to delete order.");
         }
     };
 
-    confirmNoBtn.onclick = () => { deleteModal.style.display = "none"; };
+    confirmNo.onclick = () => { deleteModal.style.display = "none"; };
+    deleteModal.onclick = e => { if (e.target === deleteModal) deleteModal.style.display = "none"; };
 
     document.addEventListener("DOMContentLoaded", loadOrders);
 </script>
