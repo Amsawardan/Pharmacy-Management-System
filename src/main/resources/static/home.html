@@ -233,6 +233,7 @@
         <h3 id="modal-name"></h3>
         <img id="modal-img" src="" alt="">
         <p>Price: LKR <span id="modal-price"></span></p>
+        <p>Available Stock: <span id="modal-stock"></span></p>
 
         <div class="qty-control">
             <button id="qty-decrease">−</button>
@@ -283,6 +284,7 @@
     const modalName = document.getElementById("modal-name");
     const modalImg = document.getElementById("modal-img");
     const modalPrice = document.getElementById("modal-price");
+    const modalStock = document.getElementById("modal-stock");
     const modalTotal = document.getElementById("modal-total");
     const qtyValue = document.getElementById("qty-value");
     const qtyIncrease = document.getElementById("qty-increase");
@@ -328,18 +330,31 @@
         modalName.textContent = currentModalMedicine.name;
         modalImg.src = currentModalMedicine.imageUrl || "https://cdn-icons-png.flaticon.com/512/2966/2966327.png";
         modalPrice.textContent = currentModalMedicine.price;
+        modalStock.textContent = currentModalMedicine.stock;
         qtyValue.textContent = modalQty;
         modalTotal.textContent = currentModalMedicine.price;
         productModal.style.display = "flex";
     }
 
-    qtyIncrease.onclick = ()=>{ modalQty++; updateModalTotal(); };
+    qtyIncrease.onclick = ()=>{
+        if (modalQty < currentModalMedicine.stock) {
+            modalQty++;
+            updateModalTotal();
+        }
+    };
     qtyDecrease.onclick = ()=>{ if(modalQty>1){ modalQty--; updateModalTotal(); } };
     function updateModalTotal(){ qtyValue.textContent=modalQty; modalTotal.textContent=currentModalMedicine.price*modalQty; }
 
     modalAddCartBtn.onclick = ()=>{
         const exist = cart.find(c=>c.id===currentModalMedicine.id);
-        if(exist){ exist.quantity += modalQty; }
+        if(exist){
+            if (exist.quantity + modalQty <= currentModalMedicine.stock) {
+                exist.quantity += modalQty;
+            } else {
+                alert("Cannot add more than available stock!");
+                return;
+            }
+        }
         else{ cart.push({...currentModalMedicine, quantity: modalQty}); }
         localStorage.setItem("cart", JSON.stringify(cart));
         updateCartCount();
@@ -379,6 +394,8 @@
     function changeQty(id,delta){
         const item = cart.find(c=>c.id===id);
         if(!item) return;
+        const med = medicines.find(m=>m.id===id);
+        if(delta > 0 && item.quantity >= med.stock){ alert("Reached maximum available stock!"); return; }
         item.quantity += delta;
         if(item.quantity<1) item.quantity=1;
         localStorage.setItem("cart",JSON.stringify(cart));
