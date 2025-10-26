@@ -165,7 +165,7 @@
             width: 400px;
             border-radius: 12px;
             padding: 20px;
-            max-height: 80%;
+            max-height: 90%;
             overflow-y: auto;
         }
         .cart-item { display:flex; justify-content: space-between; align-items: center; margin-bottom:10px; }
@@ -194,6 +194,21 @@
             transition: background 0.3s;
         }
         .place-order-btn:hover { background:#2a9d8f; }
+
+        /* Address & Contact Input inside cart modal */
+        .cart-input {
+            margin-top: 10px;
+            display:flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .cart-input label { font-weight: bold; font-size: 0.9em; color: #264653; }
+        .cart-input input {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -235,6 +250,14 @@
     <div class="cart-modal-content">
         <h3>Your Cart</h3>
         <div id="cart-items"></div>
+
+        <div class="cart-input">
+            <label for="cart-address">📍 Address</label>
+            <input type="text" id="cart-address" placeholder="Enter your delivery address">
+            <label for="cart-contact">📞 Contact Number</label>
+            <input type="text" id="cart-contact" placeholder="Enter your contact number">
+        </div>
+
         <div class="cart-total" id="cart-total">Total: LKR 0</div>
         <button class="place-order-btn" id="place-order">Place Order</button>
     </div>
@@ -253,6 +276,8 @@
     const cartItemsContainer = document.getElementById("cart-items");
     const cartCountElem = document.getElementById("cart-count");
     const cartTotalElem = document.getElementById("cart-total");
+    const addressInput = document.getElementById("cart-address");
+    const contactInput = document.getElementById("cart-contact");
 
     const productModal = document.getElementById("product-modal");
     const modalName = document.getElementById("modal-name");
@@ -364,11 +389,10 @@
     document.getElementById("place-order").onclick = async ()=>{
         if(cart.length===0){ alert("Cart is empty!"); return; }
 
-        // Ask user for address and contact number
-        let address = prompt("Enter your delivery address:");
-        if(!address || address.trim()===""){ alert("Address is required!"); return; }
-        let contactNumber = prompt("Enter your contact number:");
-        if(!contactNumber || contactNumber.trim()===""){ alert("Contact number is required!"); return; }
+        const address = addressInput.value.trim();
+        const contactNumber = contactInput.value.trim();
+        if(!address){ alert("Address is required!"); return; }
+        if(!contactNumber){ alert("Contact number is required!"); return; }
 
         let orderData = {
             orderName: "Customer Order",
@@ -378,6 +402,7 @@
             address: address,
             contactNumber: contactNumber
         };
+
         try{
             await fetch("http://localhost:8082/orders",{
                 method:"POST",
@@ -385,7 +410,6 @@
                 body: JSON.stringify(orderData)
             });
 
-            // decrease stock db update
             const decreasePayload = cart.map(c => ({ id: c.id, quantity: c.quantity }));
             try {
                 const decRes = await fetch("http://localhost:8082/api/medicines/decrease", {
@@ -405,6 +429,8 @@
             localStorage.setItem("cart",JSON.stringify(cart));
             updateCartCount();
             cartModal.style.display="none";
+            addressInput.value = "";
+            contactInput.value = "";
             alert("Order placed successfully!");
         }catch(e){ console.error(e); alert("Failed to place order"); }
     };

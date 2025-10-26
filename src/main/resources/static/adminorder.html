@@ -20,7 +20,7 @@
         }
         .order-container {
             padding: 20px;
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
         }
         .order-card {
@@ -57,15 +57,30 @@
             margin: 6px 0;
             font-size: 0.95em;
         }
-        .toggle-btn {
+        .toggle-btn, .update-btn, .delete-btn {
             font-size: 0.9em;
-            color: #0077cc;
             cursor: pointer;
             background: none;
             border: none;
             font-weight: bold;
             margin-top: 8px;
             padding: 0;
+        }
+        .toggle-btn { color: #0077cc; }
+        .update-btn { color: #2a9d8f; margin-right: 10px; }
+        .delete-btn { color: #e76f51; }
+
+        .order-input {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .order-input input {
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+            flex: 1;
         }
     </style>
 </head>
@@ -84,7 +99,6 @@
         try {
             const res = await fetch("http://localhost:8082/orders");
             const orders = await res.json();
-
             const container = document.getElementById("order-container");
             container.innerHTML = "";
 
@@ -125,23 +139,71 @@
                     }
                 });
 
-                // Add address and contact number
-                const address = order.address ? order.address : "N/A";
-                const contact = order.contactNumber ? order.contactNumber : "N/A";
+                // Address and Contact Inputs
+                const orderInputsDiv = document.createElement("div");
+                orderInputsDiv.classList.add("order-input");
+                const addressInput = document.createElement("input");
+                addressInput.type = "text";
+                addressInput.value = order.address || "N/A";
+                addressInput.placeholder = "Enter address";
+                const contactInput = document.createElement("input");
+                contactInput.type = "text";
+                contactInput.value = order.contactNumber || "N/A";
+                contactInput.placeholder = "Enter contact number";
+                orderInputsDiv.appendChild(addressInput);
+                orderInputsDiv.appendChild(contactInput);
+
+                // Update and Delete buttons
+                const updateBtn = document.createElement("button");
+                updateBtn.classList.add("update-btn");
+                updateBtn.textContent = "Update";
+                updateBtn.addEventListener("click", async () => {
+                    const updatedOrder = {
+                        ...order,
+                        address: addressInput.value.trim(),
+                        contactNumber: contactInput.value.trim()
+                    };
+                    try {
+                        await fetch(`http://localhost:8082/orders`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(updatedOrder)
+                        });
+                        alert("Order updated successfully!");
+                        loadOrders();
+                    } catch (err) {
+                        console.error(err);
+                        alert("Failed to update order.");
+                    }
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.classList.add("delete-btn");
+                deleteBtn.textContent = "Delete";
+                deleteBtn.addEventListener("click", async () => {
+                    if (!confirm("Are you sure you want to delete this order?")) return;
+                    try {
+                        await fetch(`http://localhost:8082/orders/${order.orderId}`, { method: "DELETE" });
+                        alert("Order deleted successfully!");
+                        loadOrders();
+                    } catch (err) {
+                        console.error(err);
+                        alert("Failed to delete order.");
+                    }
+                });
 
                 card.innerHTML = `
                     <h3>Order ID: ${order.orderId} <span>LKR ${order.orderVal}</span></h3>
                     <p class="order-details">Total Items: ${order.orderQuantity}</p>
-                    <p class="order-details">📍 Address: ${address}</p>
-                    <p class="order-details">📞 Contact: ${contact}</p>
                 `;
-
                 card.appendChild(toggleBtn);
                 card.appendChild(itemsContainer);
+                card.appendChild(orderInputsDiv);
+                card.appendChild(updateBtn);
+                card.appendChild(deleteBtn);
 
                 container.appendChild(card);
             });
-
         } catch (err) {
             console.error(err);
             document.getElementById("order-container").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Failed to load orders.</p>";
