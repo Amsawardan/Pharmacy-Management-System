@@ -169,6 +169,7 @@ export default function Dashboard() {
             onClick={
               metric.title === "Total Users" ? () => navigate('/users') :
               metric.title === "Total Medicines" ? () => window.open('http://localhost:8082/home.html', '_blank') :
+              metric.title === "Total Staff" ? () => navigate('/staff') :
               undefined
             }
           />
