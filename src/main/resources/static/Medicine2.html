@@ -63,6 +63,9 @@
         .price { color: #e76f51; font-weight: bold; }
         .stock { color: #2a9d8f; font-size: 0.9em; }
         .description { margin-top: 8px; color: #555; font-size: 0.9em; line-height: 1.4em; max-height: 60px; overflow: hidden; }
+        .description.expanded { max-height: none; }
+        .read-more { color: #0077cc; cursor: pointer; display: block; font-size: 0.9em; margin-top: 5px; }
+
         .add-cart-btn {
             background-color: #264653;
             color: white;
@@ -191,43 +194,6 @@
             transition: background 0.3s;
         }
         .place-order-btn:hover { background:#2a9d8f; }
-
-        /* Logout confirmation modal */
-        .logout-modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 400;
-        }
-        .logout-modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            width: 300px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        .logout-modal-content h3 { margin-bottom: 15px; color: #264653; }
-        .logout-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .logout-buttons button {
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .logout-confirm { background: #e76f51; color: white; }
-        .logout-cancel { background: #ccc; color: #333; }
-        .logout-confirm:hover { background: #d85a3b; }
-        .logout-cancel:hover { background: #bbb; }
     </style>
 </head>
 <body>
@@ -238,7 +204,7 @@
         <button class="header-btn" onclick="goToOrder()">Order</button>
         <button class="header-btn" id="cart-button">🛒 Cart (<span id="cart-count">0</span>)</button>
         <button class="header-btn" onclick="goToAccount()">Account</button>
-        <button class="header-btn logout-btn" id="logout-btn">Logout</button>
+        <button class="header-btn logout-btn" onclick="logout()">Logout</button>
     </div>
 </header>
 
@@ -252,11 +218,13 @@
         <h3 id="modal-name"></h3>
         <img id="modal-img" src="" alt="">
         <p>Price: LKR <span id="modal-price"></span></p>
+
         <div class="qty-control">
             <button id="qty-decrease">−</button>
             <span id="qty-value" class="qty-value">1</span>
             <button id="qty-increase">+</button>
         </div>
+
         <p class="product-total">Total: LKR <span id="modal-total"></span></p>
         <button id="modal-add-cart">Add to Cart</button>
     </div>
@@ -269,17 +237,6 @@
         <div id="cart-items"></div>
         <div class="cart-total" id="cart-total">Total: LKR 0</div>
         <button class="place-order-btn" id="place-order">Place Order</button>
-    </div>
-</div>
-
-<!-- Logout Confirmation Modal -->
-<div class="logout-modal" id="logout-modal">
-    <div class="logout-modal-content">
-        <h3>Are you sure you want to logout?</h3>
-        <div class="logout-buttons">
-            <button class="logout-cancel" id="cancel-logout">Cancel</button>
-            <button class="logout-confirm" id="confirm-logout">Logout</button>
-        </div>
     </div>
 </div>
 
@@ -307,15 +264,9 @@
     const qtyDecrease = document.getElementById("qty-decrease");
     const modalAddCartBtn = document.getElementById("modal-add-cart");
 
-    function goToOrder(){ window.location.href="userorder.html"; }
-    function goToAccount(){ window.location.href="account.html"; }
-
-    // Logout popup logic
-    const logoutModal = document.getElementById("logout-modal");
-    document.getElementById("logout-btn").onclick = () => logoutModal.style.display = "flex";
-    document.getElementById("cancel-logout").onclick = () => logoutModal.style.display = "none";
-    document.getElementById("confirm-logout").onclick = () => window.location.href = "login.html";
-    logoutModal.onclick = e => { if(e.target===logoutModal) logoutModal.style.display = "none"; };
+    function logout(){ window.location.href="http://localhost:8082/login.html"; }
+    function goToAccount(){ window.location.href="http://localhost:8082/account.html"; }
+    function goToOrder(){ window.location.href="order2.html"; }
 
     async function loadMedicines(){
         try{
@@ -332,6 +283,7 @@
                         <h3>${med.name}</h3>
                         <p class="price">LKR ${med.price}</p>
                         <p class="stock">Stock: ${med.stock}</p>
+                        <p class="description">${truncateText(med.description || "No description",100)}</p>
                     </div>
                     <div class="add-cart-btn" onclick="openModal(${med.id})">Add to Cart</div>
                 `;
@@ -342,6 +294,8 @@
             container.innerHTML="<p style='color:red;text-align:center;'>Failed to load medicines.</p>";
         }
     }
+
+    function truncateText(text,length){ return text.length>length?text.substring(0,length)+"...":text; }
 
     function openModal(medId){
         currentModalMedicine = medicines.find(m=>m.id===medId);
@@ -423,6 +377,27 @@
                 headers:{ "Content-Type":"application/json" },
                 body: JSON.stringify(orderData)
             });
+
+            // decrease stock db update
+
+            //  payload id, quantity
+            const decreasePayload = cart.map(c => ({ id: c.id, quantity: c.quantity }));
+            try {
+                const decRes = await fetch("http://localhost:8082/api/medicines/decrease", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(decreasePayload)
+                });
+                if (!decRes.ok) throw new Error('Failed to decrease stock');
+                // read updated medicines
+            } catch (err) {
+                console.error('Stock decrease failed', err);
+                alert('Order created but failed to update stock. Please contact admin.');
+            }
+
+            // Refresh to shows updated stock
+            await loadMedicines();
+
             cart=[];
             localStorage.setItem("cart",JSON.stringify(cart));
             updateCartCount();
