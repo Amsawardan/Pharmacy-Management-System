@@ -35,8 +35,7 @@
         .left {
           position: relative;
           flex: 1;
-          background: url('https://cdn-icons-png.flaticon.com/512/4320/4320371.png') center/180px no-repeat,
-                      linear-gradient(135deg, #2b6cb0 0%, #48bb78 100%);
+          background: linear-gradient(135deg, #2b6cb0 0%, #48bb78 100%);
           color: var(--text-light);
           display: flex;
           flex-direction: column;
@@ -46,10 +45,7 @@
           padding: 3rem 2rem;
         }
         .overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.4);
-          z-index: 1;
+          display: none;
         }
         .overlay-content {
           position: relative;
@@ -146,7 +142,25 @@
     <div class="left">
         <div class="overlay"></div>
         <div class="overlay-content">
-            <h1>Welcome to Raj Pharmacy</h1>
+            <div style="margin-bottom: 2rem;">
+                <!-- Raj Medical Logo -->
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                    <div style="width: 80px; height: 80px; background-color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                        <div style="width: 60px; height: 60px; background-color: #2d8f47; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: white; font-size: 35px; font-weight: bold; line-height: 1;">+</span>
+                        </div>
+                    </div>
+                </div>
+                <h1 style="color: #dc3545; font-size: 3.5rem; font-weight: 900; font-style: italic; text-shadow: 3px 3px 6px rgba(0,0,0,0.5); margin: 0; line-height: 1.2;">
+                    Raj <span style="font-size: 2.5rem;">Medical</span>
+                </h1>
+                <p style="color: #ffffff; font-size: 0.95rem; margin-top: 0.5rem; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-weight: 600;">
+                    Raj Medical (Pvt) Ltd.
+                </p>
+            </div>
+            <h1 style="font-size: 1.8rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem;">
+                Welcome
+            </h1>
             <p>Your trusted digital platform for secure prescriptions and user management.</p>
         </div>
     </div>
