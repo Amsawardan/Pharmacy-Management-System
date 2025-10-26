@@ -309,7 +309,7 @@
             const user = users.find(u => u.email===email && u.password===password);
             if(!user){ errorBox.textContent="Invalid email or password"; errorBox.style.display="block"; return; }
             localStorage.setItem("loggedInUser", JSON.stringify(user));
-            window.location.href="http://localhost:8082/medicine2.html";
+            window.location.href="http://localhost:8082/home.html";
         } catch(err){ errorBox.textContent="Error logging in"; errorBox.style.display="block"; }
     };
 
