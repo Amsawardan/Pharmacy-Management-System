@@ -1,19 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
-  FileText, 
   Search, 
-  Plus, 
   Filter, 
-  User, 
-  Calendar,
-  CheckCircle,
-  Clock,
-  XCircle,
-  Eye,
-  Download,
   ShoppingCart
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,14 +22,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Prescriptions() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample order data
-  const orders = [
+  // Fetch orders from API
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:8082/orders');
+      if (response.ok) {
+        const ordersData = await response.json();
+        // Transform API data to match expected format
+        const transformedOrders = ordersData.map((order: any) => ({
+          id: `ORD${order.orderId.toString().padStart(3, '0')}`,
+          customerName: order.orderName || 'Unknown',
+          customerId: `CUST${order.orderId.toString().padStart(3, '0')}`,
+          orderType: "Prescription Order",
+          issueDate: new Date().toISOString().split('T')[0], // Use current date or actual date from API if available
+          status: 'pending', // Default status, can be enhanced with actual status field
+          items: order.items?.map((item: any, index: number) => ({
+            name: item.medicineName || `Medicine ${index + 1}`,
+            quantity: item.quantity || 1,
+            instructions: item.instructions || 'As prescribed'
+          })) || [],
+          totalAmount: order.orderVal || 0,
+          priority: 'normal',
+        }));
+        setOrders(transformedOrders);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Sample order data (fallback)
+  const fallbackOrders = [
     {
       id: "ORD001",
       customerName: "Kamal Silva",
@@ -152,8 +179,8 @@ export default function Prescriptions() {
       </div>
 
       {/* Order Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card>
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
+        <Card className="cursor-pointer hover:shadow-lg transition-all duration-200" onClick={() => window.open('http://localhost:8082/adminorder.html', '_blank')}>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4 text-primary" />
@@ -164,57 +191,9 @@ export default function Prescriptions() {
             </div>
           </CardContent>
         </Card>
-        
-        <Card className="border-warning/20 bg-warning/5">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-warning" />
-              <div>
-                <p className="text-2xl font-bold text-warning">{orderStats.pending}</p>
-                <p className="text-xs text-muted-foreground">Pending</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-success/20 bg-success/5">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-success" />
-              <div>
-                <p className="text-2xl font-bold text-success">{orderStats.approved}</p>
-                <p className="text-xs text-muted-foreground">Approved</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <div className="h-3 w-3 bg-primary rounded-full" />
-              <div>
-                <p className="text-2xl font-bold text-primary">{orderStats.completed}</p>
-                <p className="text-xs text-muted-foreground">Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-destructive" />
-              <div>
-                <p className="text-2xl font-bold text-destructive">{orderStats.cancelled}</p>
-                <p className="text-xs text-muted-foreground">Cancelled</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Filters and Actions */}
+      {/* Filters and Search */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
@@ -241,216 +220,72 @@ export default function Prescriptions() {
             </SelectContent>
           </Select>
         </div>
-
-        <div className="flex gap-2">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Order
-          </Button>
-          <Button variant="outline">
-            <Filter className="h-4 w-4 mr-2" />
-            Advanced Filters
-          </Button>
-        </div>
       </div>
 
-      {/* Orders Content */}
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">All Orders</TabsTrigger>
-          <TabsTrigger value="pending" className="text-warning">Pending ({orderStats.pending})</TabsTrigger>
-          <TabsTrigger value="urgent">Urgent</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-primary" />
-                All Orders ({filteredOrders.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Order Type</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Items</TableHead>
-                      <TableHead>Amount (LKR)</TableHead>
-                      <TableHead>Priority</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
+      {/* Order Details Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShoppingCart className="h-5 w-5 text-primary" />
+            Order Details ({filteredOrders.length} orders)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Order Type</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Items</TableHead>
+                  <TableHead>Amount (LKR)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <span className="ml-3 text-muted-foreground">Loading orders...</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      No orders found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredOrders.map((order) => (
+                    <TableRow key={order.id} className="hover:bg-muted/30">
+                      <TableCell className="font-medium">{order.id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{order.customerName}</p>
+                          <p className="text-xs text-muted-foreground">ID: {order.customerId}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>{order.orderType}</TableCell>
+                      <TableCell>{order.issueDate}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{order.items.length} items</p>
+                          <p className="text-xs text-muted-foreground">{order.items[0]?.name}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>LKR {order.totalAmount.toFixed(2)}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredOrders.map((order) => (
-                      <TableRow key={order.id} className="hover:bg-muted/30">
-                        <TableCell className="font-medium">{order.id}</TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{order.customerName}</p>
-                            <p className="text-xs text-muted-foreground">ID: {order.customerId}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{order.orderType}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>{order.issueDate}</TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium">{order.items.length} items</p>
-                            <p className="text-xs text-muted-foreground">{order.items[0]?.name}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>{order.totalAmount.toFixed(2)}</TableCell>
-                        <TableCell>{getPriorityBadge(order.priority)}</TableCell>
-                        <TableCell>{getStatusBadge(order.status)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Download className="h-4 w-4" />
-                            </Button>
-                            {order.status === "pending" && (
-                              <>
-                                <Button variant="ghost" size="icon" className="text-success hover:text-success">
-                                  <CheckCircle className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pending" className="space-y-4">
-          <div className="grid gap-4">
-            {orders.filter(o => o.status === "pending").map((order) => (
-              <Card key={order.id} className="border-warning/30">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-warning" />
-                        {order.id} - {order.customerName}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Type: {order.orderType} • Date: {order.issueDate}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getPriorityBadge(order.priority)}
-                      {getStatusBadge(order.status)}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="font-medium mb-2">Order Items:</h4>
-                      <div className="space-y-2">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between items-start p-2 bg-muted/30 rounded">
-                            <div>
-                              <p className="font-medium">{item.name}</p>
-                              <p className="text-sm text-muted-foreground">{item.instructions}</p>
-                            </div>
-                            <p className="text-sm font-medium">Qty: {item.quantity}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t">
-                      <p className="font-semibold">Total Amount: LKR {order.totalAmount.toFixed(2)}</p>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          Review
-                        </Button>
-                        <Button size="sm" className="bg-success text-success-foreground hover:bg-success/90">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve
-                        </Button>
-                        <Button variant="destructive" size="sm">
-                          <XCircle className="h-4 w-4 mr-2" />
-                          Reject
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-        </TabsContent>
-
-        <TabsContent value="urgent" className="space-y-4">
-          <div className="grid gap-4">
-            {orders.filter(o => o.priority === "urgent").map((order) => (
-              <Card key={order.id} className="border-destructive/30 animate-pulse-glow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2 text-destructive">
-                        <Badge variant="destructive">URGENT</Badge>
-                        {order.id} - {order.customerName}
-                      </CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Type: {order.orderType} • Date: {order.issueDate}
-                      </p>
-                    </div>
-                    {getStatusBadge(order.status)}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="font-medium mb-2">Order Items:</h4>
-                      <div className="space-y-2">
-                        {order.items.map((item, index) => (
-                          <div key={index} className="flex justify-between items-start p-2 bg-destructive/10 rounded border border-destructive/20">
-                            <div>
-                              <p className="font-medium">{item.name}</p>
-                              <p className="text-sm text-muted-foreground">{item.instructions}</p>
-                            </div>
-                            <p className="text-sm font-medium">Qty: {item.quantity}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-3 border-t">
-                      <p className="font-semibold">Total Amount: LKR {order.totalAmount.toFixed(2)}</p>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Process Immediately
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
 
     </div>
   );
