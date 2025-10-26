@@ -26,6 +26,7 @@ public class OrderController {
 
     @PostMapping("/orders")
     public void addOrder(@RequestBody Order order) {
+        // This will now include address and contactNumber if provided in JSON body
         orderservice.addOrder(order);
     }
 

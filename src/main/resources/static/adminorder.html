@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raj Pharmacy | Orders</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2a9d8f;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .order-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .order-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+        .order-card h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #264653;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-details {
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .items-container {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s ease;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+            padding-top: 0;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.95em;
+        }
+        .toggle-btn {
+            font-size: 0.9em;
+            color: #0077cc;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-weight: bold;
+            margin-top: 8px;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🧾 Raj Pharmacy Orders</h1>
+    <p>Order History</p>
+</header>
+
+<main>
+    <div id="order-container" class="order-container"></div>
+</main>
+
+<script>
+    async function loadOrders() {
+        try {
+            const res = await fetch("http://localhost:8082/orders");
+            const orders = await res.json();
+
+            const container = document.getElementById("order-container");
+            container.innerHTML = "";
+
+            if (orders.length === 0) {
+                container.innerHTML = "<p style='text-align:center;color:#555;'>No orders found.</p>";
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement("div");
+                card.classList.add("order-card");
+
+                const itemsContainer = document.createElement("div");
+                itemsContainer.classList.add("items-container");
+
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        const itemDiv = document.createElement("div");
+                        itemDiv.classList.add("item");
+                        itemDiv.innerHTML = `
+                            <span>💊 ${item.medicineName} x${item.quantity}</span>
+                            <span>LKR ${item.price * item.quantity}</span>
+                        `;
+                        itemsContainer.appendChild(itemDiv);
+                    });
+                }
+
+                const toggleBtn = document.createElement("button");
+                toggleBtn.classList.add("toggle-btn");
+                toggleBtn.textContent = "Show Items";
+                toggleBtn.addEventListener("click", () => {
+                    if (itemsContainer.style.maxHeight === "0px" || itemsContainer.style.maxHeight === "") {
+                        itemsContainer.style.maxHeight = itemsContainer.scrollHeight + "px";
+                        toggleBtn.textContent = "Hide Items";
+                    } else {
+                        itemsContainer.style.maxHeight = "0px";
+                        toggleBtn.textContent = "Show Items";
+                    }
+                });
+
+                // Add address and contact number
+                const address = order.address ? order.address : "N/A";
+                const contact = order.contactNumber ? order.contactNumber : "N/A";
+
+                card.innerHTML = `
+                    <h3>Order ID: ${order.orderId} <span>LKR ${order.orderVal}</span></h3>
+                    <p class="order-details">Total Items: ${order.orderQuantity}</p>
+                    <p class="order-details">📍 Address: ${address}</p>
+                    <p class="order-details">📞 Contact: ${contact}</p>
+                `;
+
+                card.appendChild(toggleBtn);
+                card.appendChild(itemsContainer);
+
+                container.appendChild(card);
+            });
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById("order-container").innerHTML = "<p style='text-align:center;color:red;'>⚠️ Failed to load orders.</p>";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadOrders);
+</script>
+</body>
+</html>

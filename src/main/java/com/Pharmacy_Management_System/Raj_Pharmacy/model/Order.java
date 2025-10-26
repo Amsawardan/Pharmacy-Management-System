@@ -19,6 +19,12 @@ public class Order {
     private int orderVal;
     private int orderQuantity;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<OrderItem> items;
@@ -31,6 +37,16 @@ public class Order {
         this.orderVal = orderVal;
         this.orderQuantity = orderQuantity;
         this.setItems(items);
+    }
+
+    public Order(int orderId, String orderName, int orderVal, int orderQuantity, List<OrderItem> items, String address, String contactNumber) {
+        this.orderId = orderId;
+        this.orderName = orderName;
+        this.orderVal = orderVal;
+        this.orderQuantity = orderQuantity;
+        this.setItems(items);
+        this.address = address;
+        this.contactNumber = contactNumber;
     }
 
     // Getters and Setters
@@ -55,4 +71,10 @@ public class Order {
             }
         }
     }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getContactNumber() { return contactNumber; }
+    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
 }
