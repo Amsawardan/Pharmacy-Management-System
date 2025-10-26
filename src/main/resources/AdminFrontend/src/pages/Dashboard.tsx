@@ -166,7 +166,12 @@ export default function Dashboard() {
           <MetricCard 
             key={index} 
             {...metric} 
-            onClick={metric.title === "Total Users" ? () => navigate('/users') : undefined}
+            onClick={
+              metric.title === "Total Users" ? () => navigate('/users') :
+              metric.title === "Total Medicines" ? () => window.open('http://localhost:8082/home.html', '_blank') :
+              metric.title === "Total Staff" ? () => navigate('/staff') :
+              undefined
+            }
           />
         ))}
       </div>
