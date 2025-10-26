@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 export default function Dashboard() {
   const [totalStaff, setTotalStaff] = useState<number>(0);
   const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [totalMedicines, setTotalMedicines] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,6 +44,13 @@ export default function Dashboard() {
         const usersData = await usersResponse.json();
         setTotalUsers(usersData.length || 0);
       }
+
+      // Fetch medicines data
+      const medicinesResponse = await fetch('http://localhost:8082/api/medicines/list');
+      if (medicinesResponse.ok) {
+        const medicinesData = await medicinesResponse.json();
+        setTotalMedicines(medicinesData.length || 0);
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -62,10 +70,9 @@ export default function Dashboard() {
     },
     {
       title: "Total Medicines",
-      value: "1,248",
-      description: "847 in stock, 401 low stock",
+      value: loading ? "..." : totalMedicines.toString(),
+      description: "All medicines in inventory",
       icon: <Package className="h-4 w-4" />,
-      trend: { value: 5, isPositive: false },
     },
     {
       title: "Total Staff",
