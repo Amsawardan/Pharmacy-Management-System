@@ -1,4 +1,4 @@
-//load some random data for data blase
+//for load random data for data base
 
 package com.Pharmacy_Management_System.Raj_Pharmacy.service;
 
@@ -54,7 +54,7 @@ public class DataLoader implements CommandLineRunner {
                                      int stock, double price, int expiryYears, Long supplierId,
                                      String description, String dosage, String sideEffects) {
 
-        // Check if medicine already exists using batchNo (assumed unique)                           fun() changed(29/9)
+        // Check medicine by batchNo (assumed unique)                           fun() changed(29/9)
         Medicine med = medicineRepository.findByBatchNo(batchNo);
 
         if (med != null) {

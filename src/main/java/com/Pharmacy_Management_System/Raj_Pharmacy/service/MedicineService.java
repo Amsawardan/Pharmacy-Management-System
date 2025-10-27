@@ -22,11 +22,7 @@ public class MedicineService {
         medicine.setDeleted(false);
         return medicineRepository.save(medicine);
     }
-    /**
-     * Decrease stock for multiple medicines atomically.
-     * - Ensures stock never goes below 0.
-     * - Runs inside a transaction to avoid partial updates.
-     */
+
     @Transactional
     public List<Medicine> decreaseStockBulk(List<StockDecreaseRequest> requests) {
         for (StockDecreaseRequest r : requests) {
@@ -50,7 +46,7 @@ public class MedicineService {
             medicine.setStock(medicineDetails.getStock());
             medicine.setPrice(medicineDetails.getPrice());
             medicine.setExpiryDate(medicineDetails.getExpiryDate());
-            medicine.setDescription(medicineDetails.getDescription());  // Handle description update
+            medicine.setDescription(medicineDetails.getDescription());
             return medicineRepository.save(medicine);
         }
         throw new RuntimeException("Medicine not found with id " + id);
@@ -75,12 +71,12 @@ public class MedicineService {
         return medicineRepository.findByStockLessThanAndDeletedFalse(5);
     }
 
-    // Modified this method to pass LocalDate.now() to findExpiredMedicines
+
     public List<Medicine> getExpiredMedicines() {
         return medicineRepository.findExpiredMedicines(LocalDate.now()); // Pass the current date as argument
     }
 
-    // New method to get medicine by id
+    //to get medicine by id
     public Optional<Medicine> getMedicineById(Long id) {
         return medicineRepository.findById(id);
     }
